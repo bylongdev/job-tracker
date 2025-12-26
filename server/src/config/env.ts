@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
 
 const get = (key: string, fallback?: string) => {
 	const value = process.env[key];
@@ -14,4 +15,5 @@ const get = (key: string, fallback?: string) => {
 
 export const env = {
 	port: Number(get("PORT", "3000")),
+	database: get("POSTGRES_URL", "postgresql://postgres:admin@127.0.0.1:5432"),
 };
