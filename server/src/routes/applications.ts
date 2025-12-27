@@ -42,4 +42,37 @@ router.post("/", async (req: Request, res: Response) => {
 	}
 });
 
+// RETRIEVE
+// Retrieve all
+router.get("/", async (_req: Request, res: Response) => {
+	try {
+		const result = await pool.query(
+			"SELECT * FROM application ORDER BY updated_at DESC"
+		);
+
+		if (result.rowCount === 0) return res.status(404).json("Data Not Found!");
+
+		return res.status(200).json(result.rows);
+	} catch (e: any) {
+		return res.status(500).json(e.message);
+	}
+});
+
+// Retrieve by id
+router.get("/:id", async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params;
+		const result = await pool.query(
+			"SELECT * FROM application WHERE id = $1 ORDER BY updated_at DESC",
+			[id]
+		);
+
+		if (result.rowCount === 0) return res.status(404).json("Data Not Found!");
+
+		return res.status(200).json(result.rows);
+	} catch (e: any) {
+		return res.status(500).json(e.message);
+	}
+});
+
 export default router;
