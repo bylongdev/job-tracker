@@ -75,8 +75,8 @@ router.get("/", async (req: Request, res: Response) => {
 
 // Retrieve by id
 router.get("/:id", async (req: Request, res: Response) => {
-	const { id } = req.params;
 	try {
+		const { id } = req.params;
 		const data = await pool.query(
 			"SELECT * FROM job_ads WHERE id = $1 ORDER BY updated_at DESC",
 			[id]
@@ -147,6 +147,25 @@ router.patch("/:id", async (req: Request, res: Response) => {
 		if (e.code === "23505")
 			return res.status(409).json({ error: "URL already exists" });
 		res.status(500).json({ error: e.message });
+	}
+});
+
+// DELETE:
+router.delete("/:id", async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params;
+
+		const result = await pool.query(
+			"DELETE FROM job_ads WHERE id = $1 RETURNING *",
+			[id]
+		);
+
+		if (result.rowCount === 0) {
+			return res.status(404).json({ error: "Not found" });
+		}
+		return res.status(204).json({ status: "OK" });
+	} catch (e: any) {
+		return res.status(500).json({ error: e.message });
 	}
 });
 
