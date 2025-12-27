@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 
 import job_ads from "./job_ads.js";
 import recruiter from "./recruiters.js";
+import application from "./applications.js";
 
 const router: Router = Router();
 
@@ -17,5 +18,6 @@ router.use("/job_ads", job_ads);
 router.use("/recruiter", recruiter);
 
 // Redirect to applications
+router.use("/application", application);
 
 export default router;

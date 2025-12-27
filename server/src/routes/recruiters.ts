@@ -9,7 +9,6 @@ router.get("/health", (_req: Request, res: Response) => {
 });
 
 // CRUD:
-
 // CREATE:
 router.post("/", async (req: Request, res: Response) => {
 	try {
@@ -144,4 +143,5 @@ router.delete("/:id", async (req: Request, res: Response) => {
 		return res.status(500).json({ error: e.message });
 	}
 });
+
 export default router;
