@@ -18,59 +18,66 @@ export const initDB = async () => {
 
 		// Handle all the missing tables
 		console.log("Building database ...");
-		pool.query(`
-	  BEGIN;
+		await pool.query(`
+			CREATE EXTENSION IF NOT EXISTS pgcrypto;
+			
+			BEGIN;
 
-	  CREATE EXTENSION IF NOT EXISTS pgcrypto;
+			CREATE TABLE IF NOT EXISTS public.recruiters (
+				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+				name varchar(255) NOT NULL,
+				role varchar(255) NOT NULL DEFAULT 'Tech Recruiter',
+				working_at varchar(255) NOT NULL,
+				linkedin_url text,
+				email varchar(255),
+				phone varchar(50),
+				location varchar(255),
+				notes text,
+				created_at timestamptz NOT NULL DEFAULT now(),
+				updated_at timestamptz NOT NULL DEFAULT now()
+			);
 
-	  CREATE TABLE IF NOT EXISTS public.recruiters (
-	    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-	    name varchar(255) NOT NULL,
-	    role varchar(255) NOT NULL DEFAULT 'Tech Recruiter',
-	    working_at varchar(255) NOT NULL,
-	    linkedin_url text,
-	    email varchar(255),
-	    phone varchar(50),
-	    location varchar(255),
-			notes text,
-			created_at timestamptz NOT NULL DEFAULT now(),
-	    updated_at timestamptz NOT NULL DEFAULT now()
-	  );
+			CREATE TABLE IF NOT EXISTS public.job_ads (
+				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+				recruiter_id uuid REFERENCES public.recruiters(id),
+				company_name varchar(255) NOT NULL,
+				job_title varchar(255) NOT NULL,
+				job_description text NOT NULL,
+				published_at date NOT NULL,
+				location varchar(255),
+				job_type varchar(50) NOT NULL,
+				source varchar(50) NOT NULL,
+				url text NOT NULL UNIQUE,
+				skill_requirements varchar(255)[],
+				tech_stack varchar(255)[],
+				expired_at date,
+				salary_min integer,
+				salary_max integer,
+				created_at timestamptz NOT NULL DEFAULT now(),
+				updated_at timestamptz NOT NULL DEFAULT now()
+			);
 
-	  CREATE TABLE IF NOT EXISTS public.job_ads (
-	    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-	    recruiter_id uuid REFERENCES public.recruiters(id),
-	    company_name varchar(255) NOT NULL,
-	    job_title varchar(255) NOT NULL,
-	    job_description text NOT NULL,
-	    published_at date NOT NULL,
-	    location varchar(255),
-	    job_type varchar(50) NOT NULL,
-	    source varchar(50) NOT NULL,
-	    url text NOT NULL UNIQUE,
-	    skill_requirements varchar(255)[],
-	    tech_stack varchar(255)[],
-	    expired_at date,
-	    salary_min integer,
-	    salary_max integer,
-			created_at timestamptz NOT NULL DEFAULT now(),
-	    updated_at timestamptz NOT NULL DEFAULT now()
-	  );
+			CREATE TABLE IF NOT EXISTS public.applications (
+				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+				job_ads_id uuid NOT NULL UNIQUE REFERENCES public.job_ads(id),
+				status varchar(50) NOT NULL,
+				stage varchar(50) NOT NULL,
+				last_follow_up_at date,
+				next_follow_up_at date,
+				applied_at date NOT NULL,
+				notes text,
+				created_at timestamptz NOT NULL DEFAULT now(),
+				updated_at timestamptz NOT NULL DEFAULT now()
+			);
 
-	  CREATE TABLE IF NOT EXISTS public.applications (
-	    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-	    job_ads_id uuid NOT NULL UNIQUE REFERENCES public.job_ads(id),
-	    status varchar(50) NOT NULL,
-			stage varchar(50) NOT NULL,
-			last_follow_up_at date,
-			next_follow_up_at date,
-	    applied_at date NOT NULL,
-			notes text,
-			created_at timestamptz NOT NULL DEFAULT now(),
-	    updated_at timestamptz NOT NULL DEFAULT now()
-	  );
+			CREATE INDEX idx_job_ads_recruiter_id
+			ON job_ads(recruiter_id);
 
-	  COMMIT;
+
+			CREATE INDEX idx_applications_job_ads_id
+			ON applications(job_ads_id);
+
+			COMMIT;
 	  `);
 		console.log("Successfully building database.");
 	} catch (e) {
