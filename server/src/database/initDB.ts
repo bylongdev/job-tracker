@@ -23,6 +23,13 @@ export const initDB = async () => {
 			
 			BEGIN;
 
+			CREATE TABLE IF  NOT EXISTS public.users (
+				id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+				email TEXT UNIQUE NOT NULL,
+				password_hash TEXT NOT NULL,
+				created_at TIMESTAMPTZ DEFAULT now()
+			);
+
 			CREATE TABLE IF NOT EXISTS public.recruiters (
 				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 				name varchar(255) NOT NULL,
@@ -69,13 +76,6 @@ export const initDB = async () => {
 				created_at timestamptz NOT NULL DEFAULT now(),
 				updated_at timestamptz NOT NULL DEFAULT now()
 			);
-
-			CREATE INDEX idx_job_ads_recruiter_id
-			ON job_ads(recruiter_id);
-
-
-			CREATE INDEX idx_applications_job_ads_id
-			ON applications(job_ads_id);
 
 			COMMIT;
 	  `);
