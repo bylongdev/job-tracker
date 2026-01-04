@@ -10,6 +10,8 @@ import routes from "./routes/routes.js";
 import requireAuth from "./routes/middleware/requireAuth.js";
 
 import auth from "./routes/auth.js";
+import session from "express-session";
+import { env } from "./config/env.js";
 
 const app: Application = express();
 
@@ -18,11 +20,27 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Routes
+app.use(
+	session({
+		name: "sid",
+		secret: env.SESSION_KEY,
+		resave: false,
+		saveUninitialized: false,
+		cookie: {
+			httpOnly: true,
+			sameSite: "lax",
+			// secure: env.NODE_ENV === "production",
+			secure: false,
+			maxAge: 15 * 60 * 1000, // 15 mins
+		},
+	})
+);
 
+// Routes
+// Mount authorisation route under /api/auth
 app.use("/api/auth", auth);
 
-// Mount all route under /api
+// Mount all protected route under /api
 app.use("/api", requireAuth, routes);
 
 // Health check

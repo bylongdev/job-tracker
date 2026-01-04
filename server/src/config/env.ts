@@ -18,4 +18,6 @@ const get = (key: string, fallback?: string) => {
 export const env = {
 	port: Number(get("PORT", "3000")),
 	database: get("POSTGRES_URL", "postgresql://postgres:admin@127.0.0.1:5432"),
+	SESSION_KEY: get("SESSION_SECRET"),
+	NODE_ENV: get("NODE_ENV", "production"),
 };
