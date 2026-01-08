@@ -24,20 +24,20 @@ import { ColumnDef } from "@tanstack/react-table";
 export type JobAds = {
   company_name: string;
   job_title: string;
-  published_at: Date;
+  published_at: string;
   location: string;
   job_type:
     | ["Full-time", "Part-time", "Casual", "Contract", "Internship"]
     | string;
   salary_min?: string;
   salary_max?: string;
-  created_at: Date;
+  created_at: string;
 };
 
 export const columns: ColumnDef<JobAds>[] = [
   {
     accessorKey: "company_name",
-    header: () => <div className="text-right">Company Name</div>,
+    header: "Company Name",
   },
   {
     accessorKey: "job_title",
