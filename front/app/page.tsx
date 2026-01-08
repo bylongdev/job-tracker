@@ -5,14 +5,8 @@ import { columns } from "./columns";
 import NavBar from "./components/navBar";
 import { DataTable } from "./data-table";
 import { useState } from "react";
-import { Form, useForm } from "react-hook-form";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+
+import { JobAdsForm } from "@/components/job-ads-form";
 
 type JobAds = {
   company_name: string;
@@ -49,9 +43,7 @@ const jobAds: JobAds[] = [
 export default function Home() {
   const [isBuilding, setBuild] = useState(false);
 
-  const form = useForm();
-
-  const openCreateForm = () => setBuild(true);
+  const toggleCreateForm = () => setBuild(!isBuilding);
 
   return (
     <div className="bg-background flex min-h-screen max-w-screen select-none">
@@ -64,21 +56,7 @@ export default function Home() {
 
         {isBuilding ? (
           <div>
-            <h2>Job Ads</h2>
-            <Form>
-              <FormField
-                control={form.control}
-                name="company_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Company Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="name..." {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </Form>
+            <JobAdsForm toggleCreate={toggleCreateForm} />
           </div>
         ) : (
           <>
@@ -88,7 +66,7 @@ export default function Home() {
                 onClick={(e) => {
                   e.preventDefault();
 
-                  openCreateForm();
+                  toggleCreateForm();
                 }}
               >
                 Create Job

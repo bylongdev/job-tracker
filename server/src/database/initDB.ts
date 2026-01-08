@@ -54,7 +54,7 @@ export const initDB = async () => {
 				location varchar(255),
 				job_type varchar(50) NOT NULL,
 				source varchar(50) NOT NULL,
-				url text NOT NULL UNIQUE,
+				url text UNIQUE,
 				skill_requirements varchar(255)[],
 				tech_stack varchar(255)[],
 				expired_at date,
