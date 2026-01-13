@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { JobAdsForm } from "@/components/forms/job-ads-form";
 
 type JobAds = {
+  id: string;
   company_name: string;
   job_title: string;
   location: string;
@@ -41,6 +42,33 @@ export default function Home() {
 
   const toggleCreateForm = () => setBuild(!isBuilding);
 
+  // Delete the job by ID
+  const deleteJob = async (id: string) => {
+    try {
+      const res = await fetch(`http://localhost:4000/api/job_ads/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Id not found!");
+      }
+
+      return console.log(`Successfully delete the job at ID: "${id}"`);
+    } catch (e) {
+      console.error("Error:", e);
+    }
+  };
+
+  // View the full detailed job by ID
+  const viewJob = (id: string) => {
+    console.log(`View ${id}`);
+  };
+
+  // Edit the job then update it with provided ID
+  const editJob = (id: string) => {
+    console.log(`Edit ${id}`);
+  };
+
   return (
     <div className="bg-background flex h-full min-h-screen max-w-screen select-none">
       {/* Navbar Section */}
@@ -66,7 +94,14 @@ export default function Home() {
                 Create Job
               </Button>
             </div>
-            <DataTable columns={columns} data={jobAds} />
+            <DataTable
+              columns={columns({
+                onView: (id) => viewJob(id),
+                onEdit: (id) => editJob(id),
+                onDelete: (id) => deleteJob(id),
+              })}
+              data={jobAds}
+            />
           </>
         )}
       </main>

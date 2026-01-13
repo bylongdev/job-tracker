@@ -113,7 +113,7 @@ router.get("/", async (_req: Request, res: Response) => {
 router.get("/table", async (_req: Request, res: Response) => {
 	try {
 		const data = await pool.query(
-			"SELECT company_name, job_title, job_type, location, source, published_at FROM job_ads ORDER BY updated_at DESC"
+			"SELECT id, company_name, job_title, job_type, location, source, published_at FROM job_ads ORDER BY updated_at DESC"
 		);
 
 		return res.status(200).json(data.rows);
