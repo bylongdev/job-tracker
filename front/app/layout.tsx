@@ -5,6 +5,7 @@ import "./globals.css";
 // Themes
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import NavBar from "@/components/navBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +38,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <div className="bg-background flex h-full min-h-screen max-w-screen select-none">
+            <NavBar />
+            <div className="w-full grow overflow-auto p-8">{children}</div>
+          </div>
         </ThemeProvider>
         <Toaster position="top-center" theme="light" />
       </body>

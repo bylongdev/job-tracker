@@ -2,11 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { columns } from "./columns";
-import NavBar from "../components/navBar";
 import { DataTable } from "./data-table";
 import { useEffect, useState } from "react";
 
-import { JobAdsForm } from "@/components/forms/job-ads-form";
+import { useRouter } from "next/navigation";
 
 type JobAds = {
   id: string;
@@ -21,8 +20,8 @@ type JobAds = {
 };
 
 export default function Home() {
-  const [isBuilding, setBuild] = useState(false);
   const [jobAds, setJobsAds] = useState<JobAds[]>([]);
+  const router = useRouter();
 
   const fetchJobAds = async () => {
     const res = await fetch("http://localhost:4000/api/job_ads/table");
@@ -40,8 +39,6 @@ export default function Home() {
     })();
   }, []);
 
-  const toggleCreateForm = () => setBuild(!isBuilding);
-
   // Delete the job by ID
   const deleteJob = async (id: string) => {
     try {
@@ -53,7 +50,9 @@ export default function Home() {
         throw new Error("Id not found!");
       }
 
-      return console.log(`Successfully delete the job at ID: "${id}"`);
+      await fetchJobAds();
+
+      return;
     } catch (e) {
       console.error("Error:", e);
     }
@@ -70,41 +69,27 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-background flex h-full min-h-screen max-w-screen select-none">
-      {/* Navbar Section */}
-      <NavBar />
-
-      {/* Content Section */}
-      <main className="flex grow flex-col gap-2 overflow-auto p-4">
-        {/* Create Button */}
-
-        {isBuilding ? (
-          <JobAdsForm toggleCreate={toggleCreateForm} />
-        ) : (
-          <>
-            <div className="group self-end">
-              <Button
-                className="group-hover:cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault();
-
-                  toggleCreateForm();
-                }}
-              >
-                Create Job
-              </Button>
-            </div>
-            <DataTable
-              columns={columns({
-                onView: (id) => viewJob(id),
-                onEdit: (id) => editJob(id),
-                onDelete: (id) => deleteJob(id),
-              })}
-              data={jobAds}
-            />
-          </>
-        )}
-      </main>
-    </div>
+    <main className="flex grow flex-col gap-4">
+      {/* Create Button */}
+      <div className="group self-end">
+        <Button
+          className="group-hover:cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault();
+            router.push("/jobs/form");
+          }}
+        >
+          Create Job
+        </Button>
+      </div>
+      <DataTable
+        columns={columns({
+          onView: (id) => viewJob(id),
+          onEdit: (id) => editJob(id),
+          onDelete: (id) => deleteJob(id),
+        })}
+        data={jobAds}
+      />
+    </main>
   );
 }

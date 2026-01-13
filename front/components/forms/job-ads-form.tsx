@@ -16,6 +16,7 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
@@ -47,7 +48,9 @@ const formSchema = z
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function JobAdsForm({ toggleCreate }: { toggleCreate: () => void }) {
+export function JobAdsForm() {
+  const router = useRouter();
+
   // 1. Define a form
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -55,11 +58,11 @@ export function JobAdsForm({ toggleCreate }: { toggleCreate: () => void }) {
       company_name: "",
       job_title: "",
       job_description: "",
-      published_at: undefined, // or undefined if you want blank
+      published_at: new Date(), // or undefined if you want blank
       location: undefined,
       job_type: "",
       source: "",
-      url: undefined,
+      url: "",
       skill_requirements: undefined,
       tech_stack: undefined,
       expired_at: undefined,
@@ -92,7 +95,7 @@ export function JobAdsForm({ toggleCreate }: { toggleCreate: () => void }) {
       toast.promise(createJobAd(values), {
         loading: "Creating job ad…",
         success: () => {
-          toggleCreate();
+          router.push("/");
           return `Job ad created: ${values.company_name} · ${values.job_title}`;
         },
         error: (e) => e.message,
@@ -267,6 +270,7 @@ export function JobAdsForm({ toggleCreate }: { toggleCreate: () => void }) {
                     <Input
                       type="date"
                       onChange={(e) => field.onChange(e.target.value)}
+                      placeholder=""
                     />
                   </FormControl>
                   <FormMessage />
@@ -487,7 +491,7 @@ export function JobAdsForm({ toggleCreate }: { toggleCreate: () => void }) {
                 type="reset"
                 onClick={() => {
                   form.reset();
-                  toggleCreate();
+                  router.push("/");
                 }}
                 className="hover:cursor-pointer"
                 variant={"destructive"}
