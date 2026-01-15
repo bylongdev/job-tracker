@@ -54,7 +54,7 @@ function RecruiterForm() {
   });
 
   async function createRecruiter(values: z.infer<typeof formSchema>) {
-    const res = await fetch("http://localhost:4000/api/job_ads/", {
+    const res = await fetch("http://localhost:4000/api/recruiter/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values),
@@ -71,10 +71,10 @@ function RecruiterForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       toast.promise(createRecruiter(values), {
-        loading: "Creating job ad…",
+        loading: "Creating recruiter…",
         success: () => {
           router.push("/");
-          return `Job ad created: ${values.name} · ${values.working_at}`;
+          return `Recruiter profile created: ${values.name} · ${values.working_at}`;
         },
         error: (e) => e.message,
       });

@@ -33,10 +33,10 @@ export const initDB = async () => {
 			CREATE TABLE IF NOT EXISTS public.recruiters (
 				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 				name varchar(255) NOT NULL,
-				role varchar(255) NOT NULL DEFAULT 'Tech Recruiter',
+				role varchar(255) NOT NULL,
 				working_at varchar(255) NOT NULL,
-				linkedin_url text,
-				email varchar(255),
+				linkedin_url text UNIQUE,
+				email varchar(255) UNIQUE,
 				phone varchar(50),
 				location varchar(255),
 				note text,

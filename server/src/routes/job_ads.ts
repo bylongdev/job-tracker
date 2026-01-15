@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { pool } from "../database/db.js";
 import { createJobSchema } from "../schema/job_ads.js";
+import z from "zod";
 
 const router: Router = Router();
 
@@ -138,6 +139,43 @@ router.get("/:id", async (req: Request, res: Response) => {
 });
 
 // UPDATE:
+
+router.patch("/:id/recruiter", async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params;
+		const { recruiter_id } = z
+			.object({ recruiter_id: z.uuid() })
+			.parse(req.body);
+
+		if (recruiter_id) {
+			const recruiterExists = await pool.query(
+				`SELECT 1 FROM public.recruiters WHERE id = $1`,
+				[recruiter_id]
+			);
+			if (recruiterExists.rowCount === 0) {
+				return res.status(404).json({ error: "Recruiter not found" });
+			}
+		}
+
+		const result = await pool.query(
+			`
+      UPDATE public.job_ads
+      SET recruiter_id = $1, updated_at = now()
+      WHERE id = $2
+      RETURNING *
+      `,
+			[recruiter_id, id]
+		);
+
+		if (result.rowCount === 0) {
+			return res.status(404).json({ error: "Job ad not found" });
+		}
+
+		return res.status(200).json({ data: result.rows[0] });
+	} catch (e: any) {
+		res.status(500).json({ error: e.message });
+	}
+});
 
 router.patch("/:id", async (req: Request, res: Response) => {
 	try {

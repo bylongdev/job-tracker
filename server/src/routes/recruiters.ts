@@ -38,7 +38,29 @@ router.post("/", async (req: Request, res: Response) => {
 
 		return res.status(200).json(result.rows[0]);
 	} catch (e: any) {
-		return res.status(500).json(e.message);
+		console.error("DB ERROR:", e); // keep this
+
+		// Unique violation (url dup)
+		if (e.code === "23505") {
+			return res.status(409).json({
+				message: "Duplicate value",
+				field: e.constraint, // e.g. job_ads_url_key
+				detail: e.detail, // shows which value duplicated
+			});
+		}
+
+		// Not-null violation
+		if (e.code === "23502") {
+			return res.status(400).json({
+				message: "Missing required field",
+				detail: e.detail,
+			});
+		}
+
+		return res.status(500).json({
+			message: "Internal server error",
+			detail: e.message,
+		});
 	}
 });
 
@@ -86,7 +108,7 @@ router.patch("/:id", async (req: Request, res: Response) => {
 			"email",
 			"phone",
 			"location",
-			"note",
+			"notes",
 		]);
 
 		// Filter out key not valid and empty value
