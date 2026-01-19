@@ -8,6 +8,7 @@ export type JobType =
 export type JobAd = {
   id: string;
   recruiter_id?: string;
+  application_id?: string;
 
   company_name: string;
   job_title: string;

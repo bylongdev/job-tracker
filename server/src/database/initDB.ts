@@ -32,6 +32,7 @@ export const initDB = async () => {
 
 			CREATE TABLE IF NOT EXISTS public.recruiters (
 				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+				job_ads_id uuid REFERENCES public.job_ads(id),
 				name varchar(255) NOT NULL,
 				role varchar(255) NOT NULL,
 				working_at varchar(255) NOT NULL,
@@ -47,6 +48,7 @@ export const initDB = async () => {
 			CREATE TABLE IF NOT EXISTS public.job_ads (
 				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 				recruiter_id uuid REFERENCES public.recruiters(id),
+				application_id uuid REFERENCES public.applications(id),
 				company_name varchar(255) NOT NULL,
 				job_title varchar(255) NOT NULL,
 				job_description text NOT NULL,

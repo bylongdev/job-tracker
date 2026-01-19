@@ -209,12 +209,6 @@ export function JobAdsForm() {
                       value={field.value ?? ""}
                       onChange={field.onChange}
                     />
-
-                    {/* <Textarea
-                      className="max-h-52 min-h-24 resize-y"
-                      placeholder="Paste a short summary..."
-                      {...field}
-                    /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>

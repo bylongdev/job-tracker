@@ -22,6 +22,15 @@ import { toast } from "sonner";
 import z from "zod";
 import { Recruiter } from "../recruiter.types";
 import Link from "next/link";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { User } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formSchema = z.object({
@@ -137,9 +146,9 @@ function RecruiterCard({
   }
 
   return (
-    <Card className="max-w-xs min-w-2xs">
+    <Card className="h-fit w-fit max-w-xs min-w-2xs">
       <CardHeader className="justify-center">
-        <CardTitle>Recruiter</CardTitle>
+        <CardTitle className="text-lg font-semibold">Recruiter</CardTitle>
       </CardHeader>
       <Separator />
       <CardContent>
@@ -176,20 +185,33 @@ function RecruiterCard({
             </div>
           </>
         ) : (
-          <div className="flex justify-center">
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button>Add Recruiter</Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-full">
-                <div className="p-4">
-                  <RecruiterForm
-                    onSubmit={onSubmit}
-                    onCancel={() => setOpen(false)}
-                  />
-                </div>
-              </PopoverContent>
-            </Popover>
+          <div className="flex">
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant={"icon"}>
+                  <User />
+                </EmptyMedia>
+                <EmptyTitle>No Recruiter Yet</EmptyTitle>
+                <EmptyDescription>
+                  You haven&apos;t added any recruiter yet.
+                </EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button>Add Recruiter</Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-full">
+                    <div className="p-4">
+                      <RecruiterForm
+                        onSubmit={onSubmit}
+                        onCancel={() => setOpen(false)}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </EmptyContent>
+            </Empty>
           </div>
         )}
       </CardContent>
