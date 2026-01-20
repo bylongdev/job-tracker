@@ -209,6 +209,43 @@ router.patch("/:id/recruiter", async (req: Request, res: Response) => {
 	}
 });
 
+router.patch("/:id/application", async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params;
+		const { application_id } = z
+			.object({ application_id: z.uuid().nullable() })
+			.parse(req.body);
+
+		if (application_id) {
+			const applicationExists = await pool.query(
+				`SELECT 1 FROM public.applications WHERE id = $1`,
+				[application_id],
+			);
+			if (applicationExists.rowCount === 0) {
+				return res.status(404).json({ error: "Application not found" });
+			}
+		}
+
+		const result = await pool.query(
+			`
+      UPDATE public.job_ads
+      SET application_id = $1, updated_at = now()
+      WHERE id = $2
+      RETURNING *
+      `,
+			[application_id, id],
+		);
+
+		if (result.rowCount === 0) {
+			return res.status(404).json({ error: "Job ad not found" });
+		}
+
+		return res.status(200).json({ data: result.rows[0] });
+	} catch (e: any) {
+		res.status(500).json({ error: e.message });
+	}
+});
+
 router.patch("/:id", async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;

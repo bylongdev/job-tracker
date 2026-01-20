@@ -267,8 +267,8 @@ export function JobAdsForm() {
                   <FormControl>
                     <Input
                       type="date"
-                      onChange={(e) => field.onChange(e.target.value)}
-                      placeholder=""
+                      // onChange={(e) => field.onChange(e.target.value)}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />

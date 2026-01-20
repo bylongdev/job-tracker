@@ -21,7 +21,6 @@ router.post("/", async (req: Request, res: Response) => {
 		}
 
 		const {
-			job_ads_id,
 			status,
 			stage,
 			last_follow_up_at,
@@ -31,16 +30,8 @@ router.post("/", async (req: Request, res: Response) => {
 		} = parsed.data;
 
 		const result = await pool.query(
-			"INSERT INTO applications (job_ads_id, status, stage, last_follow_up_at, next_follow_up_at, applied_at, note) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
-			[
-				job_ads_id,
-				status,
-				stage,
-				last_follow_up_at,
-				next_follow_up_at,
-				applied_at,
-				note,
-			],
+			"INSERT INTO applications (status, stage, last_follow_up_at, next_follow_up_at, applied_at, note) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
+			[status, stage, last_follow_up_at, next_follow_up_at, applied_at, note],
 		);
 
 		return res.status(200).json(result.rows[0]);
@@ -98,7 +89,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 		if (result.rowCount === 0) return res.status(404).json("Not Found");
 
-		return res.status(200).json(result.rows);
+		return res.status(200).json(result.rows[0]);
 	} catch (e: any) {
 		return res.status(500).json(e.message);
 	}

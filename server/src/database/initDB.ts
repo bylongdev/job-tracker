@@ -32,7 +32,6 @@ export const initDB = async () => {
 
 			CREATE TABLE IF NOT EXISTS public.recruiters (
 				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-				job_ads_id uuid REFERENCES public.job_ads(id),
 				name varchar(255) NOT NULL,
 				role varchar(255) NOT NULL,
 				working_at varchar(255) NOT NULL,
@@ -40,6 +39,18 @@ export const initDB = async () => {
 				email varchar(255) UNIQUE,
 				phone varchar(50),
 				location varchar(255),
+				note text,
+				created_at timestamptz NOT NULL DEFAULT now(),
+				updated_at timestamptz NOT NULL DEFAULT now()
+			);
+
+			CREATE TABLE IF NOT EXISTS public.applications (
+				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+				status varchar(50) NOT NULL,
+				stage varchar(50) NOT NULL,
+				last_follow_up_at date,
+				next_follow_up_at date,
+				applied_at date,
 				note text,
 				created_at timestamptz NOT NULL DEFAULT now(),
 				updated_at timestamptz NOT NULL DEFAULT now()
@@ -67,18 +78,6 @@ export const initDB = async () => {
 				updated_at timestamptz NOT NULL DEFAULT now()
 			);
 
-			CREATE TABLE IF NOT EXISTS public.applications (
-				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-				job_ads_id uuid NOT NULL UNIQUE REFERENCES public.job_ads(id),
-				status varchar(50) NOT NULL,
-				stage varchar(50) NOT NULL,
-				last_follow_up_at date,
-				next_follow_up_at date,
-				applied_at date NOT NULL,
-				note text,
-				created_at timestamptz NOT NULL DEFAULT now(),
-				updated_at timestamptz NOT NULL DEFAULT now()
-			);
 
 			COMMIT;
 	  `);

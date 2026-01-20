@@ -64,7 +64,6 @@ function RecruiterCard({
   }, [recruiter_id]);
 
   useEffect(() => {
-    console.log(id);
     if (!id) return;
 
     try {
