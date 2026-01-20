@@ -16,16 +16,17 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Dot, FileQuestionMark } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Application } from "../application.types";
 import { JobAd } from "@/app/jobs/job-ads.types";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { ApplicationTimeline } from "../application-timeline.types";
 
 function ApplicationCard({ job }: { job: JobAd }) {
   const [id, setID] = useState<string>();
   const [application, setApplication] = useState<Application>();
+  const [timeline, setTimeline] = useState<ApplicationTimeline[]>();
 
   useEffect(() => {
     if (!job.application_id) return;
@@ -49,6 +50,29 @@ function ApplicationCard({ job }: { job: JobAd }) {
         console.log(data);
       };
       fetchApplication();
+    } catch (e) {
+      console.error("Error: ", e);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    try {
+      const fetchApplicationTimeline = async () => {
+        const res = await fetch(
+          `http://localhost:4000/api/application/${id}/timeline`,
+        );
+
+        if (!res.ok) {
+          console.error("Fetched failed!");
+        }
+
+        const data = await res.json();
+        setTimeline(data);
+        console.log(data);
+      };
+      fetchApplicationTimeline();
     } catch (e) {
       console.error("Error: ", e);
     }
@@ -136,14 +160,16 @@ function ApplicationCard({ job }: { job: JobAd }) {
                 </CardDescription>
               </div>
             </div>
-            {/* <div className="flex grow flex-col items-center not-last:border-r">
+            <div className="flex grow flex-col items-center not-last:border-r">
               <div className="bg-muted flex w-full justify-center border-b p-2">
                 <CardTitle>Match</CardTitle>
               </div>
               <div className="flex w-full grow items-center justify-center py-6">
-                <CardDescription className="capitalize font-semibold text-base">80%</CardDescription>
+                <CardDescription className="text-base font-semibold capitalize">
+                  80%
+                </CardDescription>
               </div>
-            </div> */}
+            </div>
             <div className="flex grow flex-col items-center not-last:border-r">
               <div className="bg-muted flex w-full justify-center border-b p-2">
                 <CardTitle>last updated</CardTitle>
@@ -165,16 +191,20 @@ function ApplicationCard({ job }: { job: JobAd }) {
             <CardTitle>Application Timeline</CardTitle>
             <CardContent>
               <ol className="relative space-y-4">
-                <li className="group relative flex pl-4">
-                  <Dot className="absolute top-0 left-0 -translate-x-1/2 scale-150 group-first:text-green-500" />
+                {timeline ? (
+                  <>
+                    {timeline.map((e) => (
+                      <li className="group relative flex pl-4" key={e.id}>
+                        <Dot className="absolute top-0 left-0 -translate-x-1/2 scale-150 group-first:text-green-500" />
 
-                  <span>test</span>
-                </li>
-                <li className="group relative flex pl-4">
-                  <Dot className="absolute top-0 left-0 -translate-x-1/2 scale-150 group-first:text-green-500" />
+                        <span>{e.created_at}</span>
+                      </li>
+                    ))}
+                  </>
+                ) : (
+                  <></>
+                )}
 
-                  <span>test</span>
-                </li>
                 <Separator
                   className="bg-muted-foreground/60 absolute top-0 left-0 -translate-x-1/2"
                   orientation="vertical"
