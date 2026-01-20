@@ -35,7 +35,6 @@ type FormValues = z.infer<typeof formSchema>;
 
 function RecruiterForm({
   onSubmit,
-  onCancel,
 }: {
   onSubmit: (values: {
     name: string;
@@ -47,7 +46,6 @@ function RecruiterForm({
     location?: string | undefined;
     note?: string | undefined;
   }) => void;
-  onCancel: () => void;
 }) {
   // 1. Define a form
   const form = useForm({
@@ -204,12 +202,11 @@ function RecruiterForm({
             type="reset"
             onClick={() => {
               form.reset();
-              onCancel();
             }}
             className="hover:cursor-pointer"
             variant={"destructive"}
           >
-            Cancel
+            Reset
           </Button>
           <Button type="submit" className="hover:cursor-pointer">
             Save

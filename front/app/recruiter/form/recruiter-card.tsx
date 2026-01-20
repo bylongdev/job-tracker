@@ -161,7 +161,6 @@ function RecruiterCard({
       toast.promise(createRecruiter(values), {
         loading: "Creating recruiter…",
         success: () => {
-          setOpen(false);
           return `Recruiter profile created: ${values.name} · ${values.working_at}`;
         },
         error: (e) => e.message,
@@ -246,10 +245,7 @@ function RecruiterCard({
                       </DialogTitle>
                     </DialogHeader>
                     <DialogDescription></DialogDescription>
-                    <RecruiterForm
-                      onSubmit={onSubmit}
-                      onCancel={() => setOpen(false)}
-                    />
+                    <RecruiterForm onSubmit={onSubmit} />
                   </DialogContent>
                 </Dialog>
               </EmptyContent>

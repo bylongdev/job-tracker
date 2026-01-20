@@ -197,7 +197,25 @@ function ApplicationCard({ job }: { job: JobAd }) {
                       <li className="group relative flex pl-4" key={e.id}>
                         <Dot className="absolute top-0 left-0 -translate-x-1/2 scale-150 group-first:text-green-500" />
 
-                        <span>{e.created_at}</span>
+                        <div>
+                          <CardDescription className="p-0.5">
+                            {new Date(e.created_at).toLocaleDateString(
+                              "en-AU",
+                              {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              },
+                            )}
+                          </CardDescription>
+
+                          <div className="p-2">
+                            <CardTitle className="text-base font-semibold">
+                              {e.title}
+                            </CardTitle>
+                            <CardDescription>{e.description}</CardDescription>
+                          </div>
+                        </div>
                       </li>
                     ))}
                   </>
