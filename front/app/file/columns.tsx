@@ -31,7 +31,11 @@ type FileStorage = {
   created_at: string;
 };
 
-export const columns = ({}): ColumnDef<FileStorage>[] => [
+export const columns = ({
+  onDelete,
+}: {
+  onDelete: (id: string) => void;
+}): ColumnDef<FileStorage>[] => [
   {
     accessorKey: "file_name",
     header: "File Name",
@@ -78,6 +82,14 @@ export const columns = ({}): ColumnDef<FileStorage>[] => [
         );
       };
 
+      const deleteFile = async () => {
+        try {
+          onDelete(file.id);
+        } catch (e) {
+          console.error("Error:", e);
+        }
+      };
+
       return (
         <>
           <DropdownMenu>
@@ -91,12 +103,14 @@ export const columns = ({}): ColumnDef<FileStorage>[] => [
               <DropdownMenuItem onSelect={() => setOpen(true)}>
                 View
               </DropdownMenuItem>
-              {/* <DropdownMenuItem>Edit</DropdownMenuItem> */}
               <DropdownMenuItem onSelect={downloadFile}>
                 Download
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="font-semibold text-red-600 focus:text-red-500">
+              <DropdownMenuItem
+                className="font-semibold text-red-600 focus:text-red-500"
+                onSelect={deleteFile}
+              >
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

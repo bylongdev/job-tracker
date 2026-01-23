@@ -46,6 +46,7 @@ export const initDB = async () => {
 
 			CREATE TABLE IF NOT EXISTS public.applications (
 				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+				job_ads_id uuid NOT NULL REFERENCES public.job_ads(id) ON DELETE CASCADE,
 				status varchar(50) NOT NULL,
 				stage varchar(50) NOT NULL,
 				last_follow_up_at date,

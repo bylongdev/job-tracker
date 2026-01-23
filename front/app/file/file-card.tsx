@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription } from "@/components/ui/field";
 
 const MAX_MB = 5;
 const MAX_BYTES = MAX_MB * 1024 * 1024;
@@ -25,6 +25,20 @@ type FileType = {
   size_bytes: number;
   created_at: string;
 };
+
+async function fetchFileCol(id: string) {
+  try {
+    const res = await fetch(`http://localhost:4000/api/application/${id}/file`);
+
+    if (!res.ok) throw new Error("Fetched failed!");
+
+    const data = await res.json();
+
+    return data;
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 function FileCard({ id }: { id?: string }) {
   const [file, setFile] = useState<File | null>(null);
@@ -40,14 +54,10 @@ function FileCard({ id }: { id?: string }) {
       return;
     }
     setFile(selected);
-
-    console.log("Picked file:", selected);
   };
 
   const onUpload = async () => {
     if (!file) return;
-    console.log("Ready to upload:", file.name, file.size, file.type);
-    // later → FormData + fetch
 
     const fd = new FormData();
     fd.append("file", file);
@@ -63,8 +73,9 @@ function FileCard({ id }: { id?: string }) {
       );
 
       if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json();
-      console.log("Uploaded:", data);
+
+      const fData = await fetchFileCol(id || "");
+      setFileCol(fData);
     } catch (e) {
       console.error(e);
     }
@@ -72,25 +83,28 @@ function FileCard({ id }: { id?: string }) {
 
   useEffect(() => {
     if (!id) return;
-
-    const fetchFileCol = async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:4000/api/application/${id}/file`,
-        );
-
-        if (!res.ok) throw new Error("Fetched failed!");
-
-        const data = await res.json();
-        console.log(data[0].id);
-        setFileCol(data);
-      } catch (e) {
-        console.error(e);
-      }
+    const fetch = async () => {
+      const data = await fetchFileCol(id);
+      setFileCol(data);
     };
 
-    fetchFileCol();
+    fetch();
   }, [id]);
+
+  const onDelete = async (fileId: string) => {
+    try {
+      const res = await fetch(`http://localhost:4000/api/file/${fileId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Delete failed!");
+
+      const fData = await fetchFileCol(id || "");
+      setFileCol(fData);
+    } catch (e) {
+      console.error("Error:", e);
+    }
+  };
 
   return (
     <Card>
@@ -116,12 +130,13 @@ function FileCard({ id }: { id?: string }) {
               <DialogDescription></DialogDescription>
             </DialogHeader>
             <Field>
-              {/* <FieldLabel>File</FieldLabel> */}
               <div className="flex gap-2">
                 <Input id="file" type="file" onChange={onFileChange} />
-                <Button onClick={onUpload} disabled={!file}>
-                  Upload
-                </Button>
+                <DialogTrigger asChild>
+                  <Button onClick={onUpload} disabled={!file}>
+                    Upload
+                  </Button>
+                </DialogTrigger>
               </div>
               <FieldDescription>Select a file to upload.</FieldDescription>
             </Field>
@@ -129,7 +144,10 @@ function FileCard({ id }: { id?: string }) {
         </Dialog>
       </CardHeader>
       <CardContent>
-        <DataTable columns={columns({})} data={fileCol} />
+        <DataTable
+          columns={columns({ onDelete: (id: string) => onDelete(id) })}
+          data={fileCol}
+        />
       </CardContent>
     </Card>
   );

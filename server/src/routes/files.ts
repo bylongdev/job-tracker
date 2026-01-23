@@ -115,14 +115,32 @@ router.delete("/:id", async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
 
-		const result = await pool.query(
-			"DELETE FROM files WHERE id = $1 RETURNING *",
+		const found = await pool.query(
+			"SELECT id, storage_key FROM files WHERE id = $1",
 			[id],
 		);
 
-		if (result.rowCount === 0) {
+		if (found.rowCount === 0) {
 			return res.status(404).json({ error: "Not found" });
 		}
+
+		const filePathFromDb = found.rows[0].storage_key as string;
+
+		const absolutePath = path.isAbsolute(filePathFromDb)
+			? filePathFromDb
+			: path.join(process.cwd(), "/uploads", filePathFromDb);
+
+		try {
+			await fs.unlink(absolutePath, (err) => {
+				if (err) throw err;
+				console.log("path/file.txt was deleted");
+			});
+		} catch (err: any) {
+			if (err?.code !== "ENOENT") throw err; // ENOENT = file not found
+		}
+
+		await pool.query("DELETE FROM files WHERE id = $1", [id]);
+
 		return res.status(204).send();
 	} catch (e: any) {
 		return res.status(500).json({ error: e.message });
