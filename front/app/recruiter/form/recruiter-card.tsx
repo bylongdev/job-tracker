@@ -78,7 +78,7 @@ function RecruiterCard({
         const res = await fetch(`http://localhost:4000/api/recruiter/${id}`);
 
         if (!res.ok) {
-          console.error("Fetched failed!");
+          throw new Error("Fetched failed!");
         }
 
         const data_recruiter = await res.json();

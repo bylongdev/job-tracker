@@ -20,6 +20,9 @@ import FileCard from "@/app/file/file-card";
 function ViewJob() {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<JobAd>();
+  const [applicationId, setApplicationId] = useState<string | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     try {
@@ -141,7 +144,10 @@ function ViewJob() {
 
                 {/* Content for Application */}
                 <TabsContent value="application">
-                  <ApplicationCard job={job} />
+                  <ApplicationCard
+                    job={job}
+                    onApplicationCreated={setApplicationId}
+                  />
                 </TabsContent>
 
                 <TabsContent value="description">
@@ -158,7 +164,7 @@ function ViewJob() {
                 </TabsContent>
 
                 <TabsContent value="files">
-                  <FileCard />
+                  <FileCard id={applicationId} />
                 </TabsContent>
               </Tabs>
               <RecruiterSection recruiter_id={job?.recruiter_id} job_id={id} />

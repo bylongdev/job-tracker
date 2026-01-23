@@ -240,6 +240,21 @@ router.get("/:id/timeline", async (req: Request, res: Response) => {
 	}
 });
 
+// Retrive the timeline list base on application ID
+router.get("/:id/file", async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params;
+		const result = await pool.query(
+			"SELECT * FROM files WHERE application_id = $1",
+			[id],
+		);
+
+		return res.status(200).json(result.rows);
+	} catch (e: any) {
+		return res.status(500).json(e.message);
+	}
+});
+
 // UPDATE
 router.patch("/:id", async (req: Request, res: Response) => {
 	try {

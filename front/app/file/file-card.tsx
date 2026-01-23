@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "../data-table";
 import { columns } from "./columns";
 import { Input } from "@/components/ui/input";
@@ -17,8 +17,18 @@ import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 const MAX_MB = 5;
 const MAX_BYTES = MAX_MB * 1024 * 1024;
 
-function FileCard() {
+type FileType = {
+  id: string;
+  file_name: string;
+  file_type: string;
+  source: string;
+  size_bytes: number;
+  created_at: string;
+};
+
+function FileCard({ id }: { id?: string }) {
   const [file, setFile] = useState<File | null>(null);
+  const [fileCol, setFileCol] = useState<FileType[]>([]);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] ?? null;
@@ -45,7 +55,7 @@ function FileCard() {
 
     try {
       const res = await fetch(
-        `http://localhost:4000/api/application/c225526f-2b95-4016-ad09-d9c07f00c74d/file/upload`,
+        `http://localhost:4000/api/application/${id}/file/upload`,
         {
           method: "POST",
           body: fd,
@@ -60,15 +70,45 @@ function FileCard() {
     }
   };
 
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchFileCol = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:4000/api/application/${id}/file`,
+        );
+
+        if (!res.ok) throw new Error("Fetched failed!");
+
+        const data = await res.json();
+        setFileCol(data);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchFileCol();
+  }, [id]);
+
   return (
     <Card>
-      <CardHeader className="flex">
-        <div>Searchbar</div>
-        <div>Sort</div>
+      <CardHeader className="flex justify-end">
         <Dialog>
-          <DialogTrigger asChild>
-            <Button>Upload</Button>
-          </DialogTrigger>
+          {fileCol.length >= 2 ? (
+            <div className="flex items-center justify-center gap-2">
+              <DialogDescription className="text-destructive text-base">
+                File limit is reached! (2/2)
+              </DialogDescription>
+              <DialogTrigger asChild>
+                <Button disabled>Upload</Button>
+              </DialogTrigger>
+            </div>
+          ) : (
+            <DialogTrigger asChild>
+              <Button>Upload</Button>
+            </DialogTrigger>
+          )}
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Upload File</DialogTitle>
@@ -88,7 +128,7 @@ function FileCard() {
         </Dialog>
       </CardHeader>
       <CardContent>
-        <DataTable columns={columns([])} data={[]} />
+        <DataTable columns={columns({})} data={fileCol} />
       </CardContent>
     </Card>
   );

@@ -133,7 +133,13 @@ async function fetchTimelineHelper(id: string) {
 }
 
 /* Main */
-function ApplicationCard({ job }: { job: JobAd }) {
+function ApplicationCard({
+  job,
+  onApplicationCreated,
+}: {
+  job: JobAd;
+  onApplicationCreated: (id: string) => void;
+}) {
   const [application, setApplication] = useState<Application>();
   const [timeline, setTimeline] = useState<ApplicationTimeline[]>();
   const [id, setId] = useState(job.application_id);
@@ -146,6 +152,7 @@ function ApplicationCard({ job }: { job: JobAd }) {
       const fetch = async () => {
         const applicationResult = await fetchApplicationHelper(id);
         setApplication(applicationResult);
+        onApplicationCreated(applicationResult.id);
 
         const timelineResult = await fetchTimelineHelper(id);
         setTimeline(timelineResult);
@@ -155,7 +162,7 @@ function ApplicationCard({ job }: { job: JobAd }) {
     } catch (e) {
       console.error("Error: ", e);
     }
-  }, [id]);
+  }, [id, onApplicationCreated]);
 
   /* Status */
   const STATUS_ORDER: ApplicationStatus[] = [
