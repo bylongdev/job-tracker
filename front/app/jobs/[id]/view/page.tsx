@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { JobAd } from "../../job-ads.types";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,54 +16,17 @@ import RecruiterSection from "@/app/recruiter/form/recruiter-card";
 
 import ApplicationCard from "@/app/application/cards/application-card";
 import FileCard from "@/app/file/file-card";
+import useFetch from "@/hooks/useFetch";
 
 function ViewJob() {
   const { id } = useParams<{ id: string }>();
-  const [job, setJob] = useState<JobAd>();
   const [applicationId, setApplicationId] = useState<string | undefined>(
     undefined,
   );
 
-  useEffect(() => {
-    try {
-      const fetchJobAds = async () => {
-        const res = await fetch(`http://localhost:4000/api/job_ads/${id}`);
-
-        if (!res.ok) {
-          throw new Error("Fetched failed!");
-        }
-
-        const data = await res.json();
-        setJob(data);
-      };
-      fetchJobAds();
-    } catch (e) {
-      console.error("Error: ", e);
-    }
-  }, [id]);
-
-  /*   useEffect(() => {
-    if (!job) return;
-    if (!job.application_id) return;
-
-    try {
-      const id = job.application_id;
-      const fetchApplication = async () => {
-        const res = await fetch(`http://localhost:4000/api/application/${id}`);
-
-        if (!res.ok) {
-          throw new Error("Fetched failed!");
-        }
-
-        const data = await res.json();
-
-        setApplication(data);
-      };
-      fetchApplication();
-    } catch (e) {
-      console.error("Error: ", e);
-    }
-  }); */
+  const { data: job } = useFetch<JobAd>(
+    `http://localhost:4000/api/job_ads/${id}`,
+  );
 
   return (
     <Card className="shadow-2xl">
