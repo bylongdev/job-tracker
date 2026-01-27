@@ -55,7 +55,6 @@ router.post("/", async (req: Request, res: Response) => {
 		const {
 			company_name,
 			job_title,
-			job_description,
 			published_at,
 			location,
 			job_type,

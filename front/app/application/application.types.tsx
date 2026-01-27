@@ -1,4 +1,5 @@
 export type Application = {
+  id: string;
   status: string;
   stage: string;
   last_follow_up: string;

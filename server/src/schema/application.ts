@@ -7,6 +7,7 @@ const dateOpt = z.preprocess(
 
 export const createApplicationSchema = z
 	.object({
+		job_ads_id: z.uuid(),
 		status: z.string(),
 		stage: z.string(),
 		last_follow_up_at: dateOpt,

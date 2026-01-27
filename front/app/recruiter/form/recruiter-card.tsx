@@ -9,15 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 import { Separator } from "@/components/ui/separator";
 import { FaLinkedin } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 import { Recruiter } from "../recruiter.types";

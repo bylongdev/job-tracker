@@ -33,6 +33,7 @@ router.post("/", async (req: Request, res: Response) => {
 		}
 
 		const {
+			job_ads_id,
 			status,
 			stage,
 			last_follow_up_at,
@@ -42,8 +43,16 @@ router.post("/", async (req: Request, res: Response) => {
 		} = parsed.data;
 
 		const result = await pool.query(
-			"INSERT INTO applications (status, stage, last_follow_up_at, next_follow_up_at, applied_at, note) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
-			[status, stage, last_follow_up_at, next_follow_up_at, applied_at, note],
+			"INSERT INTO applications (job_ads_id, status, stage, last_follow_up_at, next_follow_up_at, applied_at, note) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+			[
+				job_ads_id,
+				status,
+				stage,
+				last_follow_up_at,
+				next_follow_up_at,
+				applied_at,
+				note,
+			],
 		);
 
 		initTimeline(result.rows[0].id);
@@ -201,6 +210,23 @@ router.get("/", async (_req: Request, res: Response) => {
 		if (result.rowCount === 0) return res.status(404).json("Not Found");
 
 		return res.status(200).json(result.rows);
+	} catch (e: any) {
+		return res.status(500).json(e.message);
+	}
+});
+
+// Retrieve by job_ads
+router.get("/:id/application", async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params;
+		const result = await pool.query(
+			"SELECT * FROM applications WHERE job_ads_id = $1 ORDER BY updated_at DESC",
+			[id],
+		);
+
+		if (result.rowCount === 0) return res.status(404).json("Not Found");
+
+		return res.status(200).json(result.rows[0]);
 	} catch (e: any) {
 		return res.status(500).json(e.message);
 	}

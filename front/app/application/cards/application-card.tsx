@@ -42,63 +42,7 @@ type ApplicationStatus =
   | "offer";
 
 /* Helper */
-
-// Update application id to job_ads
-async function updateApplicationId(id: string, job_id: string) {
-  try {
-    const res = await fetch(
-      `http://localhost:4000/api/job_ads/${job_id}/application`,
-      {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ application_id: id }),
-      },
-    );
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => null);
-      throw new Error(err?.detail || err?.message || `HTTP ${res.status}`);
-    }
-
-    const data = await res.json();
-
-    return data.id;
-  } catch (e) {
-    console.error(`Error: ${e}`);
-  }
-}
-
 // Create application
-
-const createApplictaion = async (job_id: string) => {
-  try {
-    const res = await fetch(`http://localhost:4000/api/application/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        status: "created",
-        stage: "initial",
-        last_follow_up_at: "",
-        next_follow_up_at: "",
-        applied_at: "",
-        note: "",
-      }),
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => null);
-      throw new Error(err?.detail || err?.message || `HTTP ${res.status}`);
-    }
-
-    const data = await res.json();
-
-    updateApplicationId(data.id, job_id);
-
-    return data.id;
-  } catch (e) {
-    console.error(`Error: ${e}`);
-  }
-};
 
 /* Main */
 function ApplicationCard({
@@ -119,8 +63,8 @@ function ApplicationCard({
   const [id, setId] = useState(job.application_id);
 
   useEffect(() => {
-    setId(job.application_id);
-  }, [job.application_id]);
+    setId(application?.id);
+  }, [application?.id]);
 
   /* Status */
   const STATUS_ORDER: ApplicationStatus[] = [
@@ -175,7 +119,40 @@ function ApplicationCard({
     }
   };
 
+  const createApplictaion = async () => {
+    if (!job.id) return;
+    try {
+      const res = await fetch(`http://localhost:4000/api/application/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          job_ads_id: job.id,
+          status: "created",
+          stage: "initial",
+          last_follow_up_at: "",
+          next_follow_up_at: "",
+          applied_at: "",
+          note: "",
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.detail || err?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      await refetchApp();
+
+      return data.id;
+    } catch (e) {
+      console.error(`Error: ${e}`);
+    }
+  };
+
   const updateStatusApplication = async (status: string) => {
+    console.log(id);
     if (!id) return;
 
     try {
@@ -377,7 +354,7 @@ function ApplicationCard({
                 <Button
                   onClick={async (e) => {
                     e.preventDefault();
-                    const res = await createApplictaion(job.id);
+                    const res = await createApplictaion();
                     setId(res);
                   }}
                 >

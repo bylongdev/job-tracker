@@ -15,7 +15,6 @@ import {
 } from "../ui/form";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),

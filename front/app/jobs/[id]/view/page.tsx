@@ -28,8 +28,8 @@ function ViewJob() {
     `http://localhost:4000/api/job_ads/${id}`,
   );
 
-  const appUrl = job?.application_id
-    ? `http://localhost:4000/api/application/${job.application_id}`
+  const appUrl = job?.id
+    ? `http://localhost:4000/api/application/${job.id}/application`
     : undefined;
 
   const recUrl = job?.recruiter_id
@@ -42,9 +42,12 @@ function ViewJob() {
     setData: setApplication,
   } = useFetch<Application>(appUrl);
 
-  const { data: timeline, refetch: refetchTimeline } = useFetch<
-    ApplicationTimeline[]
-  >(appUrl ? `${appUrl}/timeline` : undefined);
+  const timeUrl = application
+    ? `http://localhost:4000/api/application/${application.id}/timeline`
+    : undefined;
+
+  const { data: timeline, refetch: refetchTimeline } =
+    useFetch<ApplicationTimeline[]>(timeUrl);
 
   const { data: recruiter } = useFetch<Recruiter>(recUrl);
 
