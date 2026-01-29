@@ -9,7 +9,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
@@ -21,7 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 
 type FileStorage = {
   id: string;
@@ -73,6 +71,7 @@ export const columns = ({
     cell: ({ row }) => {
       const file = row.original;
 
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       const [open, setOpen] = useState(false);
 
       const downloadFile = () => {

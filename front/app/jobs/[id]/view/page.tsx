@@ -30,7 +30,7 @@ function ViewJob() {
   );
 
   const appUrl = job?.id
-    ? `http://localhost:4000/api/application/${job.id}/application`
+    ? `http://localhost:4000/api/job_ads/${job.id}/application`
     : undefined;
 
   const recUrl = job?.recruiter_id

@@ -24,7 +24,7 @@ export default function Home() {
   const router = useRouter();
 
   const fetchJobAds = async () => {
-    const res = await fetch("http://localhost:4000/api/job_ads/table");
+    const res = await fetch("http://localhost:4000/api/job_ads");
     if (!res.ok) {
       console.error("Fetched failed!");
       return;

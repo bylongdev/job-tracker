@@ -49,9 +49,9 @@ router.post("/", async (req: Request, res: Response) => {
 			note,
 		} = parsed.data;
 
-		const application = await prisma.applications.create({
+		const application = await prisma.application.create({
 			data: {
-				job_ads_id: job_ads_id,
+				job_ad_id: job_ads_id,
 				status: status,
 				stage: stage,
 				last_follow_up_at: last_follow_up_at || null,
@@ -180,7 +180,7 @@ router.post(
 
 			const { source } = parsed.data;
 
-			const file = await prisma.files.create({
+			const file = await prisma.file.create({
 				data: {
 					application_id: id,
 					file_name: file_name,
@@ -225,7 +225,7 @@ router.post(
 // Retrieve all
 router.get("/", async (_req: Request, res: Response) => {
 	try {
-		const application = await prisma.applications.findMany({
+		const application = await prisma.application.findMany({
 			orderBy: {
 				updated_at: "desc",
 			},
@@ -246,12 +246,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 		if (!id) throw Error("Id not found");
 
-		const result = await pool.query(
-			"SELECT * FROM applications WHERE id = $1 ORDER BY updated_at DESC",
-			[id],
-		);
-
-		const application = await prisma.applications.findUniqueOrThrow({
+		const application = await prisma.application.findUniqueOrThrow({
 			where: {
 				id,
 			},
@@ -295,7 +290,7 @@ router.get("/:id/file", async (req: Request, res: Response) => {
 
 		if (!id) throw Error("Id not found");
 
-		const files = await prisma.files.findMany({
+		const files = await prisma.file.findMany({
 			where: {
 				application_id: id,
 			},
@@ -337,7 +332,7 @@ router.patch("/:id", async (req: Request, res: Response) => {
 			return res.status(400).json({ error: "No valid fields to update" });
 		}
 
-		const application = await prisma.applications.update({
+		const application = await prisma.application.update({
 			where: { id },
 			data: {
 				...data,
@@ -359,7 +354,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
 		if (!id) throw Error("Id not found");
 
-		const application = await prisma.applications.delete({
+		const application = await prisma.application.delete({
 			where: { id },
 		});
 

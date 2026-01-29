@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { DataTable } from "../data-table";
 import { columns } from "./columns";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ type FileType = {
   created_at: string;
 };
 
-async function fetchFileCol(id: string) {
+/* async function fetchFileCol(id: string) {
   try {
     const res = await fetch(`http://localhost:4000/api/application/${id}/file`);
 
@@ -38,7 +38,7 @@ async function fetchFileCol(id: string) {
   } catch (e) {
     console.error(e);
   }
-}
+} */
 
 function FileCard({
   id,
@@ -50,7 +50,6 @@ function FileCard({
   refetchFileCol: () => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
-  // const [fileCol, refetchFileCol() useState<FileType[]>([]);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] ?? null;

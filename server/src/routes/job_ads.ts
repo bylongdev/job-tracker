@@ -180,9 +180,9 @@ router.get("/:id/application", async (req: Request, res: Response) => {
 		const { id } = req.params;
 		if (!id) throw Error("Id not found");
 
-		const jobAd = await prisma.applications.findUnique({
+		const jobAd = await prisma.application.findUnique({
 			where: {
-				job_ads_id: id,
+				job_ad_id: id,
 			},
 		});
 
@@ -198,42 +198,42 @@ router.get("/:id/application", async (req: Request, res: Response) => {
 
 // UPDATE:
 
-/* router.patch("/:id/recruiter", async (req: Request, res: Response) => {
+router.patch("/:id/recruiter", async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
+
+		if (!id) throw Error("Id not found");
+
 		const { recruiter_id } = z
 			.object({ recruiter_id: z.uuid().nullable() })
 			.parse(req.body);
 
-		if (recruiter_id) {
-			const recruiterExists = await pool.query(
-				`SELECT 1 FROM public.recruiters WHERE id = $1`,
-				[recruiter_id],
-			);
-			if (recruiterExists.rowCount === 0) {
-				return res.status(404).json({ error: "Recruiter not found" });
-			}
+		if (recruiter_id == null) {
+			const jobAd = await prisma.jobAd.update({
+				where: { id },
+				data: { recruiter_id: null },
+			});
+			return res.status(200).json({ data: jobAd });
 		}
 
-		const result = await pool.query(
-			`
-      UPDATE public.job_ads
-      SET recruiter_id = $1, updated_at = now()
-      WHERE id = $2
-      RETURNING *
-      `,
-			[recruiter_id, id],
-		);
+		await prisma.recruiter.findUniqueOrThrow({
+			where: { id: recruiter_id },
+		});
 
-		if (result.rowCount === 0) {
-			return res.status(404).json({ error: "Job ad not found" });
-		}
+		const jobAd = await prisma.jobAd.update({
+			where: { id },
+			data: {
+				recruiter_id: recruiter_id,
+			},
+		});
 
-		return res.status(200).json({ data: result.rows[0] });
+		if (!jobAd) return res.status(404).json({ error: "Job ad not found" });
+
+		return res.status(200).json({ data: jobAd });
 	} catch (e: any) {
 		res.status(500).json({ error: e.message });
 	}
-}); */
+});
 
 /* router.patch("/:id/application", async (req: Request, res: Response) => {
 	try {
@@ -244,7 +244,7 @@ router.get("/:id/application", async (req: Request, res: Response) => {
 
 		if (application_id) {
 			const applicationExists = await pool.query(
-				`SELECT 1 FROM public.applications WHERE id = $1`,
+				`SELECT 1 FROM public.application WHERE id = $1`,
 				[application_id],
 			);
 			if (applicationExists.rowCount === 0) {

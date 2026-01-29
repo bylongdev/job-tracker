@@ -2,7 +2,6 @@ import { Router, type Request, type Response } from "express";
 import { pool } from "../database/db.js";
 import { createRecruiterSchema } from "../schema/recruiter.js";
 import { prisma } from "../lib/prisma.js";
-import { object } from "zod";
 
 const router: Router = Router();
 
@@ -103,17 +102,13 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 		if (!id) throw Error("Id not found");
 
-		const result = await pool.query("SELECT * FROM recruiters WHERE id = $1", [
-			id,
-		]);
-
 		const recruiter = await prisma.recruiter.findUnique({
 			where: {
 				id,
 			},
 		});
 
-		if (recruiter) return res.status(404).json("Data Not Found!");
+		if (!recruiter) return res.status(404).json("Data Not Found!");
 
 		return res.status(200).json(recruiter);
 	} catch (e: any) {
@@ -170,11 +165,6 @@ router.delete("/:id", async (req: Request, res: Response) => {
 		const { id } = req.params;
 
 		if (!id) throw Error("Id not found");
-
-		const result = await pool.query(
-			"DELETE FROM recruiters WHERE id = $1 RETURNING *",
-			[id],
-		);
 
 		const recruiter = await prisma.recruiter.delete({
 			where: { id },

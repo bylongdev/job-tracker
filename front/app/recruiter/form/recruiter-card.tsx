@@ -77,8 +77,6 @@ function RecruiterCard({
       throw new Error(err?.detail || err?.message || `HTTP ${res.status}`);
     }
 
-    await res.json();
-
     await refetchJob();
   };
 
