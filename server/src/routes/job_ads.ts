@@ -4,6 +4,8 @@ import { createJobSchema } from "../schema/job_ads.js";
 import z from "zod";
 import DOMPurify from "isomorphic-dompurify";
 
+import { prisma } from "../lib/prisma.js";
+
 const router: Router = Router();
 
 // ✅ PATCH should allow partial updates
@@ -65,36 +67,29 @@ router.post("/", async (req: Request, res: Response) => {
 			expired_at,
 			salary_max,
 			salary_min,
+			note,
 		} = parsed.data;
 
-		const result = await pool.query(
-			`
-			INSERT INTO job_ads (
-				company_name, job_title, job_description,
-				published_at, location, job_type, source, url,
-				skill_requirements, tech_stack, expired_at, salary_max, salary_min
-				)
-				VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
-				RETURNING *
-				`,
-			[
-				company_name,
-				job_title,
-				cleanDescription,
-				published_at,
-				location,
-				job_type,
-				source,
-				url,
-				skill_requirements,
-				tech_stack,
-				expired_at,
-				salary_max,
-				salary_min,
-			],
-		);
+		const jobAd = await prisma.jobAd.create({
+			data: {
+				company_name: company_name,
+				job_title: job_title,
+				job_description: cleanDescription,
+				published_at: published_at,
+				location: location ?? null,
+				job_type: job_type,
+				source: source,
+				url: url,
+				skill_requirements: skill_requirements ?? [],
+				tech_stack: tech_stack ?? [],
+				expired_at: expired_at ?? null,
+				salary_max: salary_max ?? null,
+				salary_min: salary_min ?? null,
+				note: note,
+			},
+		});
 
-		return res.status(201).json(result.rows[0]);
+		return res.status(201).json(jobAd);
 	} catch (e: any) {
 		console.error("DB ERROR:", e); // keep this
 
@@ -127,15 +122,12 @@ router.post("/", async (req: Request, res: Response) => {
 // Retrieve All
 router.get("/", async (_req: Request, res: Response) => {
 	try {
-		// const { id, platform, job_title } = req.query;
-		const result = await pool.query(
-			"SELECT * FROM job_ads ORDER BY updated_at DESC",
-		);
+		const jobAds = await prisma.jobAd.findMany();
 
-		if (result.rowCount === 0) {
+		if (!jobAds) {
 			return res.status(404).json({ error: "Not found" });
 		}
-		return res.status(200).json(result.rows);
+		return res.status(200).json(jobAds);
 	} catch (e: any) {
 		return res.status(500).json(e.message);
 	}
@@ -144,11 +136,13 @@ router.get("/", async (_req: Request, res: Response) => {
 // Retrieve data for job_ads table
 router.get("/table", async (_req: Request, res: Response) => {
 	try {
-		const data = await pool.query(
-			"SELECT id, company_name, job_title, job_type, location, source, published_at FROM job_ads ORDER BY updated_at DESC",
-		);
+		const jobAds = await prisma.jobAd.findMany({
+			orderBy: {
+				updated_at: "desc",
+			},
+		});
 
-		return res.status(200).json(data.rows);
+		return res.status(200).json(jobAds);
 	} catch (e: any) {
 		return res.status(404).json({ msg: "Data not found!" });
 	}
@@ -158,12 +152,15 @@ router.get("/table", async (_req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
-		const data = await pool.query(
-			"SELECT * FROM job_ads WHERE id = $1 ORDER BY updated_at DESC",
-			[id],
-		);
+		if (!id) throw Error("Id not found");
 
-		return res.status(200).json(data.rows[0]);
+		const jobAd = await prisma.jobAd.findUnique({
+			where: {
+				id: id,
+			},
+		});
+
+		return res.status(200).json(jobAd);
 	} catch (e: any) {
 		return res.status(500).json(e.message);
 	}
@@ -171,7 +168,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 // UPDATE:
 
-router.patch("/:id/recruiter", async (req: Request, res: Response) => {
+/* router.patch("/:id/recruiter", async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
 		const { recruiter_id } = z
@@ -206,9 +203,9 @@ router.patch("/:id/recruiter", async (req: Request, res: Response) => {
 	} catch (e: any) {
 		res.status(500).json({ error: e.message });
 	}
-});
+}); */
 
-router.patch("/:id/application", async (req: Request, res: Response) => {
+/* router.patch("/:id/application", async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
 		const { application_id } = z
@@ -243,11 +240,12 @@ router.patch("/:id/application", async (req: Request, res: Response) => {
 	} catch (e: any) {
 		res.status(500).json({ error: e.message });
 	}
-});
+}); */
 
 router.patch("/:id", async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
+		if (!id) throw Error("Id not found");
 
 		// 1) Reject unknown keys early
 		const unknownKeys = rejectUnknownKeys(req.body ?? {});
@@ -261,7 +259,7 @@ router.patch("/:id", async (req: Request, res: Response) => {
 		const parsed = patchJobSchema.safeParse(req.body);
 		if (!parsed.success) {
 			return res.status(400).json({
-				error: parsed.error.flatten(),
+				error: z.treeifyError(parsed.error),
 			});
 		}
 
@@ -273,43 +271,25 @@ router.patch("/:id", async (req: Request, res: Response) => {
 		}
 
 		// 4) Build update entries (ignore undefined)
-		const entries = Object.entries(data).filter(
-			([key, value]) => allowedList.has(key) && value !== undefined,
+		const updateData = Object.fromEntries(
+			Object.entries(data).filter(([, v]) => v !== undefined),
 		);
 
-		if (entries.length === 0) {
+		if (Object.keys(updateData).length === 0) {
 			return res.status(400).json({ error: "No valid fields to update" });
 		}
 
 		// 5) Create parameterised SQL
-		const sets: string[] = [];
-		const params: any[] = [];
+		const jobAd = await prisma.jobAd.update({
+			where: { id },
+			data: updateData,
+		});
 
-		for (const [key, value] of entries) {
-			params.push(value);
-			sets.push(`${key} = $${params.length}`);
-		}
-
-		// Always update timestamp
-		sets.push("updated_at = NOW()");
-
-		// id is last param
-		params.push(id);
-
-		const sql = `
-      UPDATE job_ads
-      SET ${sets.join(", ")}
-      WHERE id = $${params.length}
-      RETURNING *;
-    `;
-
-		const result = await pool.query(sql, params);
-
-		if (result.rowCount === 0) {
+		if (!jobAd) {
 			return res.status(404).json({ error: "Not found" });
 		}
 
-		return res.json(result.rows[0]);
+		return res.json(jobAd);
 	} catch (e: any) {
 		return res.status(500).json({ error: e.message ?? "Server error" });
 	}
@@ -319,13 +299,15 @@ router.patch("/:id", async (req: Request, res: Response) => {
 router.delete("/:id", async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
+		if (!id) throw Error("Id not found");
 
-		const result = await pool.query(
-			"DELETE FROM job_ads WHERE id = $1 RETURNING *",
-			[id],
-		);
+		const jobAd = await prisma.jobAd.delete({
+			where: {
+				id: id,
+			},
+		});
 
-		if (result.rowCount === 0) {
+		if (!jobAd) {
 			return res.status(404).json({ error: "Not found" });
 		}
 		return res.status(204).send();
