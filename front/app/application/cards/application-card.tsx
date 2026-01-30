@@ -244,40 +244,51 @@ function ApplicationCard({
                 <ol className="relative max-h-100 space-y-4 overflow-y-auto">
                   {timeline ? (
                     <>
-                      {[...timeline].reverse().map((e) => (
+                      {[...timeline].map((e) => (
                         <li className="group relative flex" key={e.id}>
                           <Circle
                             className="fill-muted-foreground mt-1 group-first:fill-green-500 group-first:text-green-500"
                             size={14}
                           />
 
-                          <div className="px-2">
-                            <CardDescription className="p-0.5">
-                              {new Date(e.created_at).toLocaleDateString(
-                                "en-AU",
-                                {
-                                  day: "2-digit",
-                                  month: "long",
-                                  year: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hourCycle: "h24",
-                                },
-                              )}
-                            </CardDescription>
+                          <div>
+                            <div className="flex items-center justify-center gap-4 px-2">
+                              <CardTitle className="group-not-first:text-muted-foreground! text-base capitalize group-not-first:font-normal!">
+                                {e.title}
+                              </CardTitle>
+                              <CardDescription className="p-0.5 text-xs">
+                                {new Date(e.created_at).toLocaleDateString(
+                                  "en-AU",
+                                  {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "2-digit",
+                                  },
+                                )}
+                              </CardDescription>
 
-                            <div className="p-2">
                               <Badge
+                                variant={"outline"}
+                                className="bg-muted scale-75 font-bold tracking-wide uppercase"
+                              >
+                                {e.event_type}
+                              </Badge>
+
+                              {/* <div className="p-2"> */}
+                              {/*   <Badge
                                 variant={"outline"}
                                 className="bg-muted text-[10px] font-bold tracking-wide uppercase"
                               >
                                 {e.event_type}
                               </Badge>
-                              <CardTitle className="text-base font-semibold capitalize">
+                              <CardTitle className="text-base capitalize group-not-first:font-normal!">
                                 {e.title}
-                              </CardTitle>
-                              <CardDescription>{e.description}</CardDescription>
+                              </CardTitle> */}
+                              {/* </div> */}
                             </div>
+                            <CardDescription className="px-4 py-2">
+                              {e.description}
+                            </CardDescription>
                           </div>
                         </li>
                       ))}
