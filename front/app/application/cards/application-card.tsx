@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -32,6 +33,13 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Field, FieldContent, FieldDescription } from "@/components/ui/field";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from "@/components/ui/item";
 
 type ApplicationStatus =
   | "created"
@@ -188,7 +196,56 @@ function ApplicationCard({
     <Card className="h-full">
       {application ? (
         <CardContent className="flex flex-col gap-8">
-          <div className="flex grow justify-around rounded-sm border shadow-md">
+          {/* Hero Card for application */}
+          <Card className="to-background/30 bg-linear-to-br from-blue-300/60">
+            <CardContent className="flex w-full justify-between gap-2">
+              <div className="grow">
+                <div className="flex flex-col gap-4">
+                  <Badge className="px-4 text-xl capitalize">Applied</Badge>
+                  <CardTitle className="text-3xl">{job.job_title}</CardTitle>
+                  <Item className="from-background border-0 bg-linear-to-r from-20% to-80%">
+                    <ItemContent className="flex flex-row items-center gap-4">
+                      <ItemTitle className="text-lg capitalize">
+                        {timeline && timeline[0].title}
+                      </ItemTitle>
+
+                      <div className="text-xl font-semibold">&gt;</div>
+
+                      <ItemDescription className="text-base">
+                        {timeline &&
+                          new Date(timeline[0].created_at).toLocaleDateString(
+                            "en-AU",
+                            {
+                              dateStyle: "medium",
+                            },
+                          )}
+                      </ItemDescription>
+                    </ItemContent>
+                  </Item>
+                </div>
+              </div>
+
+              <Item className="bg-background w-64 shadow-xl">
+                <ItemContent className="h-full items-center justify-around">
+                  <ItemTitle className="text-xl font-normal">Match</ItemTitle>
+
+                  <ItemDescription className="text-foreground text-4xl font-semibold">
+                    80%
+                  </ItemDescription>
+
+                  <ItemDescription>
+                    {`Last updated at ${new Date(
+                      application.updated_at,
+                    ).toLocaleDateString("en-AU", {
+                      dateStyle: "medium",
+                    })}`}
+                  </ItemDescription>
+                </ItemContent>
+              </Item>
+            </CardContent>
+          </Card>
+
+          {/* <div className="flex grow justify-around rounded-sm border shadow-md">
             <div className="flex grow flex-col items-center not-last:border-r">
               <div className="bg-muted flex w-full justify-center border-b p-2">
                 <CardTitle>Status</CardTitle>
@@ -199,7 +256,7 @@ function ApplicationCard({
                 </CardDescription>
               </div>
             </div>
-            {/*  <div className="flex grow flex-col items-center not-last:border-r">
+            <div className="flex grow flex-col items-center not-last:border-r">
               <div className="bg-muted flex w-full justify-center border-b p-2">
                 <CardTitle>Next Step</CardTitle>
               </div>
@@ -208,7 +265,7 @@ function ApplicationCard({
                   {application.stage}
                 </CardDescription>
               </div>
-            </div> */}
+            </div>
             <div className="flex grow flex-col items-center not-last:border-r">
               <div className="bg-muted flex w-full justify-center border-b p-2">
                 <CardTitle>Match</CardTitle>
@@ -235,7 +292,7 @@ function ApplicationCard({
                 </CardDescription>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="flex flex-col gap-4">
             <CardTitle>Application Timeline</CardTitle>
             <Card>
