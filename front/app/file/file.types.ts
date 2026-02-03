@@ -5,4 +5,5 @@ export type FileType = {
   source: string;
   size_bytes: number;
   created_at: string;
+  category: string;
 };

@@ -167,6 +167,7 @@ router.post(
 			const mime_type = req.file.mimetype;
 			const size_bytes = req.file.size;
 			const storage_key = req.file.filename;
+
 			const file_type =
 				mime_type === "application/pdf"
 					? "pdf"
@@ -178,7 +179,7 @@ router.post(
 							? "doc"
 							: "other";
 
-			const { source } = parsed.data;
+			const { source, category } = parsed.data;
 
 			const file = await prisma.file.create({
 				data: {
@@ -188,6 +189,7 @@ router.post(
 					mime_type: mime_type,
 					size_bytes: size_bytes,
 					source: source,
+					category: category,
 					storage_key: storage_key,
 				},
 			});
