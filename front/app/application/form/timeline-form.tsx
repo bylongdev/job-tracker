@@ -15,7 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import Tiptap from "@/components/ui/tiptap";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -50,9 +49,9 @@ function TimelineForm({
     "applied",
     "viewed",
     "screening",
-    "interview",
-    "negotiate",
-    "offer",
+    "interviewing",
+    "negotiating",
+    "offered",
   ];
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {

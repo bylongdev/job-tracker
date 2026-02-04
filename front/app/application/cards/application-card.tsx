@@ -31,6 +31,8 @@ import {
   Item,
   ItemContent,
   ItemDescription,
+  ItemFooter,
+  ItemHeader,
   ItemTitle,
 } from "@/components/ui/item";
 import {
@@ -75,28 +77,6 @@ function ApplicationCard({
     setId(application?.id);
   }, [application?.id]);
 
-  /* Status */
-  const STATUS_ORDER: ApplicationStatus[] = [
-    "created",
-    "applied",
-    "screening",
-    "interview",
-    "final_interview",
-    "offer",
-  ];
-
-  // Filter out the default "created"
-  const VISIBLE_STATUSES = STATUS_ORDER.filter((s) => s !== "created");
-
-  // Match the current index with the status
-  const currentIndex = application
-    ? STATUS_ORDER.indexOf(application.status as ApplicationStatus)
-    : -1;
-
-  // Disable all the status already passed
-  const isDisabled = (status: ApplicationStatus) =>
-    STATUS_ORDER.indexOf(status) <= currentIndex;
-
   const createTimeline = async (value: ApplicationTimeline) => {
     if (!id) return;
 
@@ -137,8 +117,8 @@ function ApplicationCard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           job_ads_id: job.id,
-          status: "created",
-          stage: "initial",
+          status: "Applying",
+          stage: "created",
           last_follow_up_at: "",
           next_follow_up_at: "",
           applied_at: "",
@@ -171,6 +151,10 @@ function ApplicationCard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           stage: values.title,
+          status:
+            (values.title == "accepted" && "accepted") ||
+            (values.title == "rejected" && "rejected") ||
+            "applying",
         }),
       });
 
@@ -202,9 +186,9 @@ function ApplicationCard({
             <CardContent className="flex w-full justify-between gap-2">
               <div className="grow">
                 <div className="flex flex-col gap-4">
-                  <Badge className="px-4 text-xl uppercase">
+                  {/*   <Badge className="px-4 text-xl uppercase">
                     {application.stage}
-                  </Badge>
+                  </Badge> */}
                   <CardTitle className="text-3xl">{job.job_title}</CardTitle>
                   <Item className="from-background border-0 bg-linear-to-r from-20% to-80%">
                     <ItemContent className="flex flex-row items-center gap-4">
@@ -228,26 +212,21 @@ function ApplicationCard({
                 </div>
               </div>
 
-              {/* <Item className="bg-background h-full w-64 items-center justify-around shadow-xl">
-                <ItemHeader>
-                  <ItemTitle>Created at</ItemTitle>
+              <Item className="bg-background h-full w-64 shadow-xl">
+                <ItemHeader className="justify-center">
+                  <ItemTitle className="text-lg capitalize">Status</ItemTitle>
                 </ItemHeader>
-                <ItemContent></ItemContent>
-                <ItemFooter></ItemFooter>
-                <ItemTitle className="text-xl font-normal">Match</ItemTitle>
-
-                <ItemDescription className="text-foreground text-4xl font-semibold">
-                  80%
-                </ItemDescription>
-
-                <ItemDescription>
-                  {`Last updated at ${new Date(
-                    application.updated_at,
-                  ).toLocaleDateString("en-AU", {
-                    dateStyle: "medium",
-                  })}`}
-                </ItemDescription>
-              </Item> */}
+                <ItemContent className="text-center">
+                  <span
+                    className={`text-4xl font-bold uppercase ${application.status.toLocaleLowerCase() == "rejected" ? "text-destructive" : application.status.toLocaleLowerCase() == "accepted" ? "text-green-500" : ""}`}
+                  >
+                    {application.status}
+                  </span>
+                </ItemContent>
+                <ItemFooter>
+                  {/* <ItemDescription>Last updated</ItemDescription> */}
+                </ItemFooter>
+              </Item>
             </CardContent>
           </Card>
 
@@ -330,7 +309,7 @@ function ApplicationCard({
               </CardHeader>
               <CardContent className="relative">
                 <div className="absolute top-0 left-7 h-full border-l-2" />
-                <ol className="relative max-h-100 space-y-4 overflow-y-scroll">
+                <ol className="relative max-h-100 space-y-4 overflow-y-auto">
                   {timeline ? (
                     <>
                       {[...timeline].map((e) => (
@@ -443,7 +422,10 @@ function ApplicationCard({
                     description: "",
                   })
                 }
-                disabled={application.stage.toLocaleLowerCase() === "accepted"}
+                disabled={
+                  application.stage.toLocaleLowerCase() == "accepted" ||
+                  application.stage.toLocaleLowerCase() != "offered"
+                }
               >
                 Accept
               </Button>

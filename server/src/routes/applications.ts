@@ -28,7 +28,7 @@ router.post("/", async (req: Request, res: Response) => {
 				data: {
 					application_id: applicationId,
 					event_type: "system",
-					title: "Created",
+					title: "Initialised",
 				},
 			});
 			return timeline;
