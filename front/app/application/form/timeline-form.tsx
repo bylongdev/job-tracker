@@ -101,7 +101,7 @@ function TimelineForm({
                             key={stage}
                             value={stage}
                             onSelect={(v) => field.onChange(v)}
-                            className="hover:cursor-pointer"
+                            className="capitalize hover:cursor-pointer"
                           >
                             {stage}
                           </CommandItem>

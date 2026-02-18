@@ -69,7 +69,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex grow flex-col gap-4">
+    <main className="flex w-full grow flex-col gap-4 px-10">
       {/* Create Button */}
       <div className="group self-end">
         <Button

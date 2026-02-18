@@ -70,22 +70,40 @@ router.post("/", async (req: Request, res: Response) => {
 			note,
 		} = parsed.data;
 
-		const jobAd = await prisma.jobAd.create({
-			data: {
-				company_name: company_name,
-				job_title: job_title,
+		const jobAd = await prisma.jobAd.upsert({
+			where: {
+				url: url, // unique field
+			},
+			update: {
+				company_name,
+				job_title,
 				job_description: cleanDescription,
-				published_at: published_at,
+				published_at,
 				location: location ?? null,
-				job_type: job_type,
-				source: source,
-				url: url,
+				job_type,
+				source,
 				skill_requirements: skill_requirements ?? [],
 				tech_stack: tech_stack ?? [],
 				expired_at: expired_at ?? null,
 				salary_max: salary_max ?? null,
 				salary_min: salary_min ?? null,
-				note: note,
+				note,
+			},
+			create: {
+				company_name,
+				job_title,
+				job_description: cleanDescription,
+				published_at,
+				location: location ?? null,
+				job_type,
+				source,
+				url,
+				skill_requirements: skill_requirements ?? [],
+				tech_stack: tech_stack ?? [],
+				expired_at: expired_at ?? null,
+				salary_max: salary_max ?? null,
+				salary_min: salary_min ?? null,
+				note,
 			},
 		});
 

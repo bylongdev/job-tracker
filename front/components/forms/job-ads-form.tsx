@@ -103,7 +103,7 @@ export function JobAdsForm({
       toast.promise(createJobAd(values), {
         loading: "Creating job ad…",
         success: () => {
-          router.push("/");
+          router.refresh();
           return `Job ad created: ${values.company_name} · ${values.job_title}`;
         },
         error: (e) => e.message,

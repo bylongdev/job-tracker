@@ -19,14 +19,11 @@ import {
 import { Circle, FileQuestionMark, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Application } from "../application.types";
-import { JobAd } from "@/app/jobs/job-ads.types";
+import { JobAd } from "@/components/types/job-ads.types";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ApplicationTimeline } from "../application-timeline.types";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Item,
   ItemContent,
@@ -42,14 +39,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import TimelineForm from "../form/timeline-form";
-
-type ApplicationStatus =
-  | "created"
-  | "applied"
-  | "screening"
-  | "interview"
-  | "final_interview"
-  | "offer";
 
 /* Helper */
 // Create application
