@@ -52,8 +52,12 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function JobAdsForm({
   initialData,
+  onSubmit,
+  onCancel,
 }: {
   initialData?: Partial<FormValues>;
+  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  onCancel: () => void;
 }) {
   const router = useRouter();
 
@@ -83,7 +87,7 @@ export function JobAdsForm({
   const [stackInput, setStackInput] = useState("");
   // 2. Define a submit handler
 
-  async function createJobAd(values: unknown) {
+  /* async function createJobAd(values: unknown) {
     const res = await fetch("http://localhost:4000/api/job_ads/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -103,7 +107,7 @@ export function JobAdsForm({
       toast.promise(createJobAd(values), {
         loading: "Creating job ad…",
         success: () => {
-          router.refresh();
+          router.push("/");
           return `Job ad created: ${values.company_name} · ${values.job_title}`;
         },
         error: (e) => e.message,
@@ -111,7 +115,7 @@ export function JobAdsForm({
     } catch (e) {
       console.error("Error:", e);
     }
-  }
+  } */
 
   return (
     <Form {...form}>
@@ -498,7 +502,7 @@ export function JobAdsForm({
             type="reset"
             onClick={() => {
               form.reset();
-              router.push("/jobs");
+              onCancel();
             }}
             className="hover:cursor-pointer"
             variant={"destructive"}

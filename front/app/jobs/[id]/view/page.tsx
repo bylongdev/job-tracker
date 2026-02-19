@@ -29,10 +29,42 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { formSchema } from "@/utils/schema/job-ad";
+import z from "zod";
+import { useState } from "react";
 
+async function createJobAd(values: unknown) {
+  const res = await fetch("http://localhost:4000/api/job_ads/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(values),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail || err?.message || `HTTP ${res.status}`);
+  }
+
+  return res.json();
+}
+
+// Main
 function ViewJob() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
+  const [jobAdOpen, setJobAdOpen] = useState(false);
 
   const { data: job, refetch: refetchJob } = useFetch<JobAd>(
     `http://localhost:4000/api/job_ads/${id}`,
@@ -68,7 +100,7 @@ function ViewJob() {
 
   const { data: files, refetch: refetchFiles } = useFetch<FileType[]>(fileUrl);
 
-  const deleteJob = async () => {
+  const deleteJobHandler = async () => {
     const res = await fetch(`http://localhost:4000/api/job_ads/${id}`, {
       method: "DELETE",
     });
@@ -76,8 +108,27 @@ function ViewJob() {
     return res;
   };
 
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      toast.promise(createJobAd(values), {
+        loading: "Creating job ad…",
+        success: () => {
+          setJobAdOpen(false);
+          return `Job ad updated: ${values.company_name} · ${values.job_title}`;
+        },
+        error: (e) => e.message,
+      });
+    } catch (e) {
+      console.error("Error:", e);
+    }
+  }
+
+  function onCancel() {
+    setJobAdOpen(false);
+  }
+
   return (
-    <Card className="mx-auto w-full max-w-[80%] shadow-2xl">
+    <Card className="mx-auto w-full max-w-7xl shadow-2xl">
       {job ? (
         <>
           <CardHeader>
@@ -95,7 +146,7 @@ function ViewJob() {
 
               {/* Action buttons */}
               <div className="flex gap-2">
-                <Dialog>
+                <Dialog open={jobAdOpen} onOpenChange={setJobAdOpen}>
                   <DialogTrigger asChild>
                     <Button variant={"outline"}>Edit</Button>
                   </DialogTrigger>
@@ -108,6 +159,8 @@ function ViewJob() {
                       })}
                     </DialogTitle>
                     <JobAdsForm
+                      onSubmit={onSubmit}
+                      onCancel={onCancel}
                       initialData={{
                         company_name: job.company_name,
                         job_title: job.job_title,
@@ -131,16 +184,35 @@ function ViewJob() {
                     />
                   </DialogContent>
                 </Dialog>
-                <Button
-                  variant={"destructive"}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    deleteJob();
-                    router.push("/jobs");
-                  }}
-                >
-                  Delete
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant={"destructive"}>Delete</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete your application from our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        variant={"destructive"}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          deleteJobHandler();
+                          router.push("/jobs");
+                        }}
+                      >
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </CardHeader>
