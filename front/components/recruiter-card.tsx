@@ -15,7 +15,7 @@ import { FaLinkedin } from "react-icons/fa";
 import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
-import { Recruiter } from "../../components/types/recruiter.types";
+import { Recruiter } from "@/components/types/recruiter.types";
 import Link from "next/link";
 import {
   Empty,

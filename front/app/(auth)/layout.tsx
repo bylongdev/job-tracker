@@ -5,9 +5,6 @@ import "./globals.css";
 // Themes
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import NavBar from "@/components/navBar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,15 +37,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            <AppSidebar />
-            <main className="h-full w-full">
-              <SidebarTrigger />
-              <div className="min-h-screen w-full grow overflow-auto p-8">
-                {children}
-              </div>
-            </main>
-          </SidebarProvider>
+          <main className="h-full w-full">
+            <div className="min-h-screen w-full grow overflow-auto p-8">
+              {children}
+            </div>
+          </main>
+
           {/* <div className="bg-background flex h-full min-h-screen max-w-screen select-none">
             
           </div> */}

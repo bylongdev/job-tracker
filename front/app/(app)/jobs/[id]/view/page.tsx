@@ -8,19 +8,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useParams, useRouter } from "next/navigation";
-import { JobAd } from "../../../../components/types/job-ads.types";
+import { JobAd } from "../../../../../components/types/job-ads.types";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { Application } from "@/app/application/application.types";
-import { ApplicationTimeline } from "@/app/application/application-timeline.types";
+import { Application } from "@/components/types/application.types";
+import { ApplicationTimeline } from "@/components/types/application-timeline.types";
 
-import RecruiterSection from "@/app/recruiter/recruiter-card";
-import ApplicationCard from "@/app/application/cards/application-card";
-import FileCard from "@/app/file/file-card";
+import RecruiterSection from "@/components/recruiter-card";
+import ApplicationCard from "@/components/application-card";
+import FileCard from "@/components/file-card";
 import useFetch from "@/hooks/useFetch";
 import { Recruiter } from "@/components/types/recruiter.types";
-import { FileType } from "@/app/file/file.types";
+import { FileType } from "@/components/types/file.types";
 
 import { JobAdsForm } from "@/components/forms/job-ads-form";
 import {

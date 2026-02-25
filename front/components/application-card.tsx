@@ -18,11 +18,11 @@ import {
 } from "@/components/ui/empty";
 import { Circle, FileQuestionMark, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Application } from "../application.types";
+import { Application } from "./types/application.types";
 import { JobAd } from "@/components/types/job-ads.types";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ApplicationTimeline } from "../application-timeline.types";
+import { ApplicationTimeline } from "./types/application-timeline.types";
 
 import {
   Item,
@@ -38,7 +38,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import TimelineForm from "../form/timeline-form";
+import TimelineForm from "./forms/timeline-form";
 
 /* Helper */
 // Create application
