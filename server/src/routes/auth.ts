@@ -3,12 +3,9 @@ import type { Request, Response } from "express";
 import requireAuth from "./middleware/requireAuth.js";
 import { pool } from "../database/db.js";
 import bcrypt from "bcrypt";
+import { prisma } from "../lib/prisma.js";
 
 const router: Router = Router();
-
-router.get("/health", (_req: Request, res: Response) => {
-	return res.status(200).json({ status: "OK" });
-});
 
 router.get("/", requireAuth, (req: Request, res: Response) => {
 	res.json({
@@ -20,12 +17,14 @@ router.get("/", requireAuth, (req: Request, res: Response) => {
 // Signup API
 router.post("/signup", async (req: Request, res: Response) => {
 	try {
-		const { email, password } = req.body;
+		const { email, password, name } = req.body;
 
 		// Check if the email exists in the table
-		const exists = (
-			await pool.query(`SELECT id FROM users WHERE email = $1`, [email])
-		).rows[0];
+		const exists = await prisma.user.findUnique({
+			where: {
+				email: email,
+			},
+		});
 
 		if (exists) return res.status(409).json({ error: "User already exists" });
 
@@ -33,14 +32,23 @@ router.post("/signup", async (req: Request, res: Response) => {
 		const passwordHash = await bcrypt.hash(password, 12);
 
 		// Add user into table
-		const result = await pool.query(
-			"INSERT INTO users(email, password_hash) VALUES($1, $2) RETURNING *",
-			[email, passwordHash]
-		);
+		const result = await prisma.user.create({
+			data: {
+				name,
+				email,
+				password_hash: passwordHash,
+			},
+		});
 
-		if (result.rowCount == 0) return res.sendStatus(401);
+		if (!result) return res.sendStatus(401);
 
-		return res.status(201).json({ msg: "User Created!" });
+		// Create server session
+		req.session.userId = result.id;
+
+		req.session.save((err) => {
+			if (err) return res.status(500).json({ error: "Session save failed" });
+			return res.status(201).json({ ok: true, userId: result.id });
+		});
 	} catch (e: any) {
 		return res.status(401).json(e.message);
 	}
@@ -52,26 +60,22 @@ router.post("/login", async (req: Request, res: Response) => {
 		const { email, password } = req.body;
 
 		// Authenticate user credentials here
-		const user = await pool.query(
-			"SELECT id, password_hash FROM users WHERE email = $1",
-			[email]
-		);
+		const user = await prisma.user.findUnique({
+			where: {
+				email,
+			},
+		});
 
 		// Check the email if exists
-		if (user.rowCount == 0)
-			return res.status(401).json({ error: "Invalid credentials" });
+		if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
 		// Check the password is matched with the encrypted one
-		const isMatched = await bcrypt.compare(
-			password,
-			user.rows[0].password_hash
-		);
+		const isMatched = await bcrypt.compare(password, user.password_hash);
 		if (!isMatched)
 			return res.status(401).json({ error: "Invalid credentials" });
 
 		// Create server session
-		// console.log(user.rows[0].id);
-		req.session.userId = user.rows[0].id;
+		req.session.userId = user.id;
 
 		req.session.save((err) => {
 			if (err) return res.status(500).json({ error: "Session save failed" });
@@ -86,7 +90,7 @@ router.post("/login", async (req: Request, res: Response) => {
 router.post("/logout", async (req: Request, res: Response) => {
 	try {
 		req.session.destroy(() => {
-			res.clearCookie("sid");
+			res.clearCookie("jobtracker.sid");
 			res.json({ ok: true });
 		});
 	} catch (e: any) {

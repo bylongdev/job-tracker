@@ -87,7 +87,7 @@ router.get("/", async (_req: Request, res: Response) => {
 			},
 		});
 
-		if (recruiter) return res.status(404).json("Data Not Found!");
+		if (!recruiter) return res.status(404).json("Data Not Found!");
 
 		return res.status(200).json(recruiter);
 	} catch (e: any) {

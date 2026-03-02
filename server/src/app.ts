@@ -16,16 +16,17 @@ import { env } from "./config/env.js";
 const app: Application = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 app.use(morgan("dev"));
 
 app.use(
 	session({
-		name: "sid",
+		name: "jobtracker.sid",
 		secret: env.SESSION_KEY,
 		resave: false,
 		saveUninitialized: false,
+		rolling: true,
 		cookie: {
 			httpOnly: true,
 			sameSite: "lax",
@@ -33,7 +34,7 @@ app.use(
 			secure: false,
 			maxAge: 15 * 60 * 1000, // 15 mins
 		},
-	})
+	}),
 );
 
 // Routes
