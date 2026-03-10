@@ -56,9 +56,9 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <SidebarProvider>
-            <AppSidebar />
+            {/* <AppSidebar /> */}
             <main className="h-full w-full">
-              <SidebarTrigger />
+              {/* <SidebarTrigger /> */}
               <div className="min-h-screen w-full grow overflow-auto p-8">
                 {children}
               </div>

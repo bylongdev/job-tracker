@@ -30,8 +30,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
+    setError(null);
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -46,9 +46,12 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         body: JSON.stringify({ name, email, password }),
       });
 
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json().catch(() => ({
+        error: "Invalid response from server.",
+      }));
 
       if (!res.ok) {
+        console.error("Signup error:", data.error || res.statusText);
         setError(data.error || "Signup failed.");
         return;
       }
@@ -56,6 +59,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       // signed up + session created
       router.push("/");
     } catch {
+      console.error("Network error during signup.");
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
