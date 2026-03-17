@@ -1,4 +1,5 @@
-from worker.llm.job_ad.extractor import JobAdExtractor
+from llm.job_ad.extractor import JobAdExtractor
+from llm.job_ad.skill_generator import JobAdSkillGenerator
 
 if __name__ == "__main__":
   JOB_AD_TEXT = """About Karbon
@@ -46,10 +47,18 @@ We recruit and reward people based on capability and performance. We don’t dis
 Generally, if you are a good person, we want to talk to you. 😛
 If there are any adjustments or accommodations that we can make to assist you during the recruitment process, and your journey at Karbon, contact us at people.support@karbonhq.com for a confidential discussion."""
   
+
+ 
   extractor = JobAdExtractor()
+  skill_generator = JobAdSkillGenerator()
 
   json_response = extractor.extract(job_ad_text=JOB_AD_TEXT)
 
   print(json_response)
+
+  skills = skill_generator.generate_skills(extracted_data=json_response)
+
+
+  print(skills)
 
 
