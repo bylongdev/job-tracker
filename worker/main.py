@@ -1,5 +1,6 @@
 from llm.job_ad.extractor import JobAdExtractor
 from llm.job_ad.skill_generator import JobAdSkillGenerator
+from llm.job_ad.summariser import JobAdSummariser
 
 if __name__ == "__main__":
   JOB_AD_TEXT = """About Karbon
@@ -51,10 +52,13 @@ If there are any adjustments or accommodations that we can make to assist you du
  
   extractor = JobAdExtractor()
   skill_generator = JobAdSkillGenerator()
+  # summariser = JobAdSummariser()
+
+  # print(summariser.summarise(job_ad_text=JOB_AD_TEXT))
 
   json_response = extractor.extract(job_ad_text=JOB_AD_TEXT)
 
-  print(json_response)
+  # print(json_response)
 
   skills = skill_generator.generate_skills(extracted_data=json_response)
 

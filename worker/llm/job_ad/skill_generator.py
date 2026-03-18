@@ -16,39 +16,29 @@ class JobAdSkillGenerator:
 
 Your task: derive EXACTLY top 6 high-level skills from a job advertisement.
 
-Rules:
-- Skills must be derived strictly from the responsibilities, requirements, and tech stack in the job ad.
-- Return EXACTLY 6 skills.
+RULES:
+- Use ONLY information from responsibilities, requirements, and tech stack.
+- Skills must be high-level capability areas (not tools or tasks).
+- Group closely related items into one coherent skill.
+- Keep a consistent abstraction level.
+- Avoid overlap between skills.
 
-- Each skill must represent a high-level capability area (not a single tool, product, or one-off task).
-- Each skill must group only closely related technologies, tasks, or knowledge into one coherent concept.
+NAMING:
+- 2–5 words per skill
+- Noun-based, simple and practical (e.g. "Frontend Development", "Testing")
+- Avoid vague traits or low-level actions
 
-- Prefer practical, noun-based capability categories (e.g. "Backend Development", "Testing", "Database Management", "AI Integration").
-- Maintain a consistent abstraction level across all skills.
+DETAILS:
+- Format: "Skill Name (tech/examples)"
+- Include only explicitly mentioned tools/technologies
+- Keep details concise
+- Omit parentheses if not needed
 
-- Each skill name must be concise (2–5 words max).
-- Avoid overly formal or inflated wording (e.g. avoid "Implementation", "Optimization", "Architecture Design" unless clearly and explicitly supported).
-- Prefer simple, widely understood category names.
-- Prefer noun-based skill names over verb phrases.
+FALLBACK:
+- If fewer than 6 clear skills, derive carefully from strong signals
+- Do NOT invent new domains
 
-- Do NOT output low-level actions or task phrases (e.g. "writing code", "using React", "improving workflow").
-- Do NOT include vague personal traits or soft qualities (e.g. "communication", "mindset", "good judgement").
-
-- Only derive skills clearly supported by the job ad.
-- Do NOT invent new domains or introduce concepts not grounded in the text.
-- Do NOT over-generalise weak signals.
-
-- Only group technologies that are directly related in the job ad context.
-- Do NOT mix unrelated domains within a single skill.
-
-- Avoid redundancy: skills must not overlap in meaning.
-- Ensure each skill represents a distinct capability area.
-
-- If fewer than 6 clear skills are present:
-  - Derive remaining skills conservatively from repeated or strongly implied technical themes.
-  - Do NOT introduce new domains or speculative concepts.
-
-Format:
+FORMAT:
 - Return EXACTLY 6 skills.
 - Each skill must follow this format:
 
